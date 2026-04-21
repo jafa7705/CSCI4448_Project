@@ -12,6 +12,7 @@
 ./main/java/recipeRealm/decorator/DoubleServingDecorator.java
 ./main/java/recipeRealm/decorator/RecipeDecorator.java
 ./main/java/recipeRealm/decorator/GlutenFreeDecorator.java
+./main/java/recipeRealm/TerminalGame.java
 ./main/java/recipeRealm/observer/OrderFulfillmentObserver.java
 ./main/java/recipeRealm/observer/KitchenObserver.java
 ./main/java/recipeRealm/observer/SatisfactionObserver.java
