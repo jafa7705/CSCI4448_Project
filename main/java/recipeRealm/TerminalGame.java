@@ -49,7 +49,7 @@ public class TerminalGame {
         new TerminalGame().run();
     }
 
-    private void run() {
+    public void run() {
         printSplash();
         boolean playing = true;
         while (playing) {

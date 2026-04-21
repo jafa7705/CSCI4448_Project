@@ -1,7 +1,12 @@
 Recipe Realm — Design Patterns, Architecture & Test Cases
 Project: Recipe Realm
 Team: Jason Fan, Alec Volkert
-Language: Java with JavaFX
+Language: Java 
+
+Compile command: find . -name "*.java" > sources.txt && javac -d out @sources.txt
+Swing command: find . -name "*.java" > sources.txt && javac -d out @sources.txt && java -cp out recipeRealm.Main --swing
+Terminal command: find . -name "*.java" > sources.txt && javac -d out @sources.txt && java -cp out recipeRealm.Main --terminal
+
 
 # Design Patterns
 
