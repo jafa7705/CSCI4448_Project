@@ -1,9 +1,22 @@
 package recipeRealm.decorator;
 
 import recipeRealm.cooking.CookingStrategy;
-import recipeRealm.model.*;
+import recipeRealm.model.CookingResult;
+import recipeRealm.model.Ingredient;
+import recipeRealm.model.Recipe;
+
 import java.util.List;
 
+/**
+ * Decorator Pattern: Abstract base decorator for Recipe.
+ *
+ * Wraps a Recipe and delegates all method calls to the wrapped instance.
+ * Concrete subclasses override only the methods they wish to modify
+ * (e.g., getName, getBasePrice, getComplexity) without touching the rest.
+ *
+ * This avoids combinatorial explosion of subclasses — instead of creating
+ * PremiumSpicyDoubleServing as a dedicated class, decorators stack freely.
+ */
 public abstract class RecipeDecorator implements Recipe {
 
     protected final Recipe wrapped;
@@ -22,35 +35,4 @@ public abstract class RecipeDecorator implements Recipe {
     @Override public double getBasePrice()                { return wrapped.getBasePrice(); }
     @Override public String getCategory()                 { return wrapped.getCategory(); }
     @Override public int getPreparationTimeSeconds()      { return wrapped.getPreparationTimeSeconds(); }
-}
-
-
-class ExtraSpicyDecorator extends RecipeDecorator {
-
-    public ExtraSpicyDecorator(Recipe recipe) { super(recipe); }
-
-    @Override public String getName()     { return wrapped.getName() + " (Extra Spicy)"; }
-    @Override public double getBasePrice(){ return wrapped.getBasePrice() + 2.0; }
-    @Override public int getComplexity()  { return Math.min(5, wrapped.getComplexity() + 1); }
-}
-
-class PremiumDecorator extends RecipeDecorator {
-
-    public PremiumDecorator(Recipe recipe) { super(recipe); }
-
-    @Override public String getName()          { return "Premium " + wrapped.getName(); }
-    @Override public double getBasePrice()     { return wrapped.getBasePrice() * 1.5; }
-    @Override public int getRequiredSkillLevel(){ return Math.min(10, wrapped.getRequiredSkillLevel() + 1); }
-    @Override public String getDescription()   {
-        return wrapped.getDescription() + " (Made with premium ingredients)";
-    }
-}
-
-class DoubleServingDecorator extends RecipeDecorator {
-
-    public DoubleServingDecorator(Recipe recipe) { super(recipe); }
-
-    @Override public String getName()               { return wrapped.getName() + " (Double)"; }
-    @Override public double getBasePrice()          { return wrapped.getBasePrice() * 2.0; }
-    @Override public int getPreparationTimeSeconds(){ return wrapped.getPreparationTimeSeconds() * 2; }
 }
