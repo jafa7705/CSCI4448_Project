@@ -1,3 +1,4 @@
+./main/java/recipeRealm/ui/SwingGame.java
 ./main/java/recipeRealm/cooking/FryingStrategy.java
 ./main/java/recipeRealm/cooking/GrillingStrategy.java
 ./main/java/recipeRealm/cooking/BakingStrategy.java
