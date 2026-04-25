@@ -19,4 +19,13 @@ public interface Recipe {
     default CookingResult cook(int playerSkillLevel) {
         return getCookingStrategy().cook(this, playerSkillLevel);
     }
+    
+    default boolean containsIngredient(String ingredientId) {
+        for (Ingredient ingredient : getIngredients()) {
+            if (ingredient.getId().equals(ingredientId)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

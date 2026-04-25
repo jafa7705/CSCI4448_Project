@@ -3,13 +3,6 @@ package recipeRealm.cooking;
 import recipeRealm.model.CookingResult;
 import recipeRealm.model.Recipe;
 
-/**
- * Strategy Pattern: SteamingStrategy.
- *
- * Steaming is a forgiving, low-heat method — it is harder to burn food,
- * but under-skilled players produce bland, watery results. A high skill
- * level unlocks precise timing bonuses that push the score into elite range.
- */
 public class SteamingStrategy implements CookingStrategy {
 
     private static final int BASE_TIME_SECONDS = 50;

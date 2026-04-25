@@ -4,13 +4,12 @@ package recipeRealm.model;
 public class CookingResult {
 
     private final boolean success;
-    private final int score;          
+    private final int score;
     private final int timeTakenSeconds;
     private final String cookingMethod;
     private final String feedbackMessage;
 
-    public CookingResult(boolean success, int score, int timeTakenSeconds,
-                         String cookingMethod, String feedbackMessage) {
+    public CookingResult(boolean success, int score, int timeTakenSeconds, String cookingMethod, String feedbackMessage) {
         this.success = success;
         this.score = score;
         this.timeTakenSeconds = timeTakenSeconds;

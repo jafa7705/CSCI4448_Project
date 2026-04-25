@@ -7,6 +7,7 @@ import recipeRealm.decorator.PremiumDecorator;
 import recipeRealm.factory.CustomerOrderFactory;
 import recipeRealm.model.CookingResult;
 import recipeRealm.model.CustomerOrder;
+import recipeRealm.model.Ingredient;
 import recipeRealm.model.Recipe;
 import recipeRealm.service.RecipeService;
 
@@ -176,10 +177,35 @@ public class TerminalGame {
         }
 
         printCookingResult(result, order);
+
+        List<Ingredient> alerts = game.getStockObserver().getAlerts();
+
+        for (Ingredient ingredient: alerts){
+            System.out.println(" WARNING: " + ingredient.getName() + " is Low/Expired");
+            System.out.println("  1  Buy more    2  Remove affected recipes");
+            String choice = scanner.nextLine().trim();
+            if (choice.equals("1")){
+                double cost = ingredient.getRequiredAmount() * ingredient.getCostPerUnit();
+                if(cost > game.getTotalEarnings()){
+                    game.getRecipeService().removeRecipeWithIngredient(ingredient);
+                    System.out.println("Insufficient funds Removed all recipes using " + ingredient.getName());
+                }else{
+                    game.spendFunds(cost);
+                    game.getInventoryService().restockIngredient(ingredient.getId(), ingredient.getRequiredAmount());
+                }
+
+            }else{
+                game.getRecipeService().removeRecipeWithIngredient(ingredient);
+                System.out.println("  Removed all recipes using " + ingredient.getName());
+            }
+        }
+        game.getStockObserver().clearAlerts();
         ordersCompleted++;
         checkLevelUp();
         System.out.println();
     }
+
+
 
     private Recipe offerDecoration(Recipe base) {
         System.out.println("  Add a special variation? (optional)");
@@ -199,7 +225,7 @@ public class TerminalGame {
         };
     }
 
-    private void printCookingResult(CookingResult result, CustomerOrder order) {
+    private void printCookingResult(CookingResult result, CustomerOrder order){
         System.out.println();
         System.out.println(DIVIDER);
         System.out.printf("  Method:   %s%n", result.getCookingMethod());
@@ -240,8 +266,7 @@ public class TerminalGame {
         System.out.println("  INVENTORY");
         System.out.println(DIVIDER);
         game.getInventoryService().getAllIngredients().forEach(i -> {
-            String status = i.isExpired() ? " [EXPIRED]"
-                          : !i.isAvailable() ? " [LOW STOCK]" : "";
+            String status = i.isExpired() ? " [EXPIRED]": !i.isAvailable() ? " [LOW STOCK]" : "";
             System.out.printf("  %-14s  %.1f %s%s%n",
                     i.getName(), i.getQuantity(), i.getUnit(), status);
         });
@@ -355,9 +380,7 @@ public class TerminalGame {
         System.out.println();
     }
 
-    // ------------------------------------------------------------------ //
-    // Display helpers                                                     //
-    // ------------------------------------------------------------------ //
+ 
 
     private String skillBar(int level) {
         StringBuilder sb = new StringBuilder("Lv." + level + " [");

@@ -1,5 +1,6 @@
 package recipeRealm.service;
 
+import recipeRealm.model.Ingredient;
 import recipeRealm.model.Recipe;
 import recipeRealm.repository.InMemoryRecipeRepository;
 
@@ -47,5 +48,14 @@ public class RecipeService {
 
     public int getTotalRecipeCount() {
         return recipeRepository.size();
+    }
+
+    public void removeRecipeWithIngredient(Ingredient ingredient){
+        List<Recipe> recipes= getAllRecipes();
+        for(Recipe recipe: recipes){
+            if(recipe.containsIngredient(ingredient.getId())){
+                recipeRepository.delete(recipe.getId());
+            }
+        }
     }
 }

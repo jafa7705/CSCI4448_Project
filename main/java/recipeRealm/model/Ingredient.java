@@ -12,8 +12,7 @@ public class Ingredient {
     private double costPerUnit;
     private LocalDate expiryDate;  
 
-    public Ingredient(String id, String name, String unit,
-                      double quantity, double requiredAmount, double costPerUnit) {
+    public Ingredient(String id, String name, String unit, double quantity, double requiredAmount, double costPerUnit) {
         this.id = id;
         this.name = name;
         this.unit = unit;

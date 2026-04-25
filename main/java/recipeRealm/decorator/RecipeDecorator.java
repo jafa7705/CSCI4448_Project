@@ -25,14 +25,34 @@ public abstract class RecipeDecorator implements Recipe {
         this.wrapped = wrapped;
     }
 
-    @Override public String getId()                       { return wrapped.getId(); }
-    @Override public String getName()                     { return wrapped.getName(); }
-    @Override public String getDescription()              { return wrapped.getDescription(); }
-    @Override public List<Ingredient> getIngredients()    { return wrapped.getIngredients(); }
-    @Override public CookingStrategy getCookingStrategy() { return wrapped.getCookingStrategy(); }
-    @Override public int getRequiredSkillLevel()          { return wrapped.getRequiredSkillLevel(); }
-    @Override public int getComplexity()                  { return wrapped.getComplexity(); }
-    @Override public double getBasePrice()                { return wrapped.getBasePrice(); }
-    @Override public String getCategory()                 { return wrapped.getCategory(); }
-    @Override public int getPreparationTimeSeconds()      { return wrapped.getPreparationTimeSeconds(); }
+    @Override public String getId(){
+        return wrapped.getId(); 
+        }
+    @Override public String getName(){ 
+        return wrapped.getName(); 
+    }
+    @Override public String getDescription(){ 
+        return wrapped.getDescription(); 
+    }
+    @Override public List<Ingredient> getIngredients(){ 
+        return wrapped.getIngredients(); 
+    }
+    @Override public CookingStrategy getCookingStrategy() { 
+        return wrapped.getCookingStrategy(); 
+    }
+    @Override public int getRequiredSkillLevel(){
+        return wrapped.getRequiredSkillLevel(); 
+    }
+    @Override public int getComplexity(){ 
+        return wrapped.getComplexity(); 
+    }
+    @Override public double getBasePrice(){ 
+        return wrapped.getBasePrice(); 
+    }
+    @Override public String getCategory(){ 
+        return wrapped.getCategory(); 
+    }
+    @Override public int getPreparationTimeSeconds(){ 
+        return wrapped.getPreparationTimeSeconds(); 
+    }
 }

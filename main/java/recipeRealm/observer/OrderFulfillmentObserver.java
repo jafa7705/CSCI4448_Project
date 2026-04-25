@@ -12,7 +12,7 @@ import recipeRealm.model.CustomerOrder;
  */
 public class OrderFulfillmentObserver implements KitchenObserver {
 
-    private double totalEarnings = 0.0;
+    private  double totalEarnings = 0.0;
 
     @Override
     public void onDishCompleted(CustomerOrder order, CookingResult result) {
@@ -31,4 +31,8 @@ public class OrderFulfillmentObserver implements KitchenObserver {
     }
 
     public double getTotalEarnings() { return totalEarnings; }
+
+    public void spend(double amount){
+        totalEarnings -= amount;
+    }
 }

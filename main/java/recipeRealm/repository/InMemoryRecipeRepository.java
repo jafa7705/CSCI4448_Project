@@ -5,7 +5,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 
-public class InMemoryRecipeRepository implements StorageRepository<Recipe, String> {
+public class InMemoryRecipeRepository implements StorageRepository<String, Recipe> {
 
     private final Map<String, Recipe> store = new LinkedHashMap<>();
 

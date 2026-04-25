@@ -6,7 +6,7 @@ import recipeRealm.observer.InventoryObserver;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class InventoryRepository implements StorageRepository<Ingredient, String> {
+public class InventoryRepository implements StorageRepository<String, Ingredient> {
 
     private static final double LOW_STOCK_MULTIPLIER = 2.0; // warn if qty < 2× required
 
