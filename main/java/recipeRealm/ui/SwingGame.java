@@ -89,8 +89,6 @@ public class SwingGame {
         frame.setLocationRelativeTo(null);
     }
 
-    //Status bar
-
     private JPanel buildStatusBar() {
         JPanel bar = new JPanel(new FlowLayout(FlowLayout.LEFT, 16, 8));
         bar.setBackground(ACCENT);
@@ -111,8 +109,6 @@ public class SwingGame {
         sep.setForeground(new Color(120, 120, 120));
         return sep;
     }
-
-    //Centre panel
 
     private JPanel buildCentrePanel() {
         JPanel centre = new JPanel();
@@ -154,11 +150,9 @@ public class SwingGame {
         centre.add(orderCard);
         centre.add(Box.createVerticalStrut(12));
 
-        // Result card
         JPanel resultCard = buildCard();
         resultCard.setLayout(new BoxLayout(resultCard, BoxLayout.Y_AXIS));
 
-        // Score tiles
         JPanel tileRow = new JPanel(new FlowLayout(FlowLayout.CENTER, 6, 4));
         tileRow.setOpaque(false);
         for (int i = 0; i < scoreTiles.length; i++) {
@@ -192,7 +186,6 @@ public class SwingGame {
         return card;
     }
 
-    // ---- Bottom bar -------------------------------------------------- //
 
     private JPanel buildBottomBar() {
         JPanel bar = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 8));
@@ -202,10 +195,6 @@ public class SwingGame {
         return bar;
     }
 
-    // ------------------------------------------------------------------ //
-    // Button wiring                                                       //
-    // ------------------------------------------------------------------ //
-
     private void wireButtons() {
         btnNewOrder.addActionListener(e -> handleNewOrder());
         btnCook.addActionListener(e -> handleCook());
@@ -214,10 +203,6 @@ public class SwingGame {
 
         setCookingButtonsEnabled(false);
     }
-
-    // ------------------------------------------------------------------ //
-    // Handlers                                                            //
-    // ------------------------------------------------------------------ //
 
     private void handleNewOrder() {
         List<Recipe> available = game.getRecipeService().getAvailableRecipes(game.getPlayerSkillLevel());
@@ -247,7 +232,6 @@ public class SwingGame {
         Recipe base = pendingOrder.getRequestedRecipe();
         Recipe finalRecipe = applyDecoration(base);
 
-        // Rebuild order with possibly-decorated recipe
         CustomerOrder order = recipeRealm.factory.CustomerOrderFactory.createForRecipe(finalRecipe);
         game.getOrderService().enqueueOrder(order);
 

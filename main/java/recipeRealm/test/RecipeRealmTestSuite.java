@@ -10,13 +10,7 @@ import recipeRealm.service.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-/**
- * Hand-rolled test suite for Recipe Realm (no external test framework).
- *
- * Each test method is self-contained and prints PASS / FAIL. The main()
- * method runs all tests and exits with code 1 if any test fails, making
- * this suitable for use in a CI script.
- */
+
 public class RecipeRealmTestSuite {
     private static int passed = 0, failed = 0;
     private static void assertTrue(String label, boolean condition) {
