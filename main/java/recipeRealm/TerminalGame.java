@@ -14,7 +14,7 @@ import recipeRealm.service.RecipeService;
 import java.util.List;
 import java.util.Scanner;
 
- // Run command: java -cp out recipeRealm.TerminalGame
+ // Run cmd java -cp out recipeRealm.TerminalGame
 public class TerminalGame {
 
     private static final String DIVIDER  = "─────────────────────────────────────────";
