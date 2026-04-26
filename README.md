@@ -6,6 +6,13 @@ Uses gradle as a build agent
 Compile usng gradle compileJava
 Run swing mod with gradle run
 
+Test coverage cmds
+rm -rf out && mkdir out && find ./main -name "*.java" > sources.txt && javac --release 21 -d out @sources.txt
+java -javaagent:jacoco/lib/jacocoagent.jar=destfile=jacoco.exec -cp out recipeRealm.test.RecipeRealmTestSuite
+java -jar jacoco/lib/jacococli.jar report jacoco.exec --classfiles out --sourcefiles ./main/java --html coverage-report
+open coverage-report/index.html
+
+
 # Design Patterns
 
 ## Strategy Pattern

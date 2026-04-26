@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RecipeDecorator.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JaCoCo Coverage Report</a> &gt; <a href="index.source.html" class="el_package">recipeRealm.decorator</a> &gt; <span class="el_source">RecipeDecorator.java</span></div><h1>RecipeDecorator.java</h1><pre class="source lang-java linenums">package recipeRealm.decorator;
+
+import recipeRealm.cooking.CookingStrategy;
+import recipeRealm.model.CookingResult;
+import recipeRealm.model.Ingredient;
+import recipeRealm.model.Recipe;
+
+import java.util.List;
+
+/**
+ * Decorator Pattern: Abstract base decorator for Recipe.
+ *
+ * Wraps a Recipe and delegates all method calls to the wrapped instance.
+ * Concrete subclasses override only the methods they wish to modify
+ * (e.g., getName, getBasePrice, getComplexity) without touching the rest.
+ *
+ * This avoids combinatorial explosion of subclasses — instead of creating
+ * PremiumSpicyDoubleServing as a dedicated class, decorators stack freely.
+ */
+public abstract class RecipeDecorator implements Recipe {
+
+    protected final Recipe wrapped;
+
+<span class="fc" id="L24">    protected RecipeDecorator(Recipe wrapped) {</span>
+<span class="fc" id="L25">        this.wrapped = wrapped;</span>
+<span class="fc" id="L26">    }</span>
+
+    @Override public String getId(){
+<span class="nc" id="L29">        return wrapped.getId(); </span>
+        }
+    @Override public String getName(){ 
+<span class="nc" id="L32">        return wrapped.getName(); </span>
+    }
+    @Override public String getDescription(){ 
+<span class="nc" id="L35">        return wrapped.getDescription(); </span>
+    }
+    @Override public List&lt;Ingredient&gt; getIngredients(){ 
+<span class="nc" id="L38">        return wrapped.getIngredients(); </span>
+    }
+    @Override public CookingStrategy getCookingStrategy() { 
+<span class="nc" id="L41">        return wrapped.getCookingStrategy(); </span>
+    }
+    @Override public int getRequiredSkillLevel(){
+<span class="nc" id="L44">        return wrapped.getRequiredSkillLevel(); </span>
+    }
+    @Override public int getComplexity(){ 
+<span class="nc" id="L47">        return wrapped.getComplexity(); </span>
+    }
+    @Override public double getBasePrice(){ 
+<span class="nc" id="L50">        return wrapped.getBasePrice(); </span>
+    }
+    @Override public String getCategory(){ 
+<span class="fc" id="L53">        return wrapped.getCategory(); </span>
+    }
+    @Override public int getPreparationTimeSeconds(){ 
+<span class="nc" id="L56">        return wrapped.getPreparationTimeSeconds(); </span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

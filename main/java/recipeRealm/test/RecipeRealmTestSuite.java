@@ -402,6 +402,434 @@ public class RecipeRealmTestSuite {
     }
 
     // ================================================================== //
+    // Additional tests for coverage                                      //
+    // ================================================================== //
+
+    // ---- Ingredient model -------------------------------------------- //
+
+    private static void testIngredientConsumeReducesQuantity() {
+        System.out.println("\nTest 21: Ingredient.consume() reduces quantity by requiredAmount");
+        Ingredient ing = new Ingredient("i1", "Salt", "g", 100, 10, 0.01);
+        ing.consume();
+        assertEquals("Quantity after consume", 90.0, ing.getQuantity());
+    }
+
+    private static void testIngredientConsumeThrowsWhenUnavailable() {
+        System.out.println("\nTest 22: Ingredient.consume() throws when quantity < requiredAmount");
+        Ingredient ing = new Ingredient("i2", "Egg", "pieces", 1, 5, 0.30);
+        boolean threw = false;
+        try { ing.consume(); } catch (IllegalStateException e) { threw = true; }
+        assertTrue("consume() throws when insufficient", threw);
+    }
+
+    private static void testIngredientRestockIncreasesQuantity() {
+        System.out.println("\nTest 23: Ingredient.restock() increases quantity");
+        Ingredient ing = new Ingredient("i3", "Flour", "g", 50, 100, 0.002);
+        ing.restock(200);
+        assertEquals("Quantity after restock", 250.0, ing.getQuantity());
+    }
+
+    private static void testIngredientRestockThrowsOnNegative() {
+        System.out.println("\nTest 24: Ingredient.restock() throws on non-positive amount");
+        Ingredient ing = new Ingredient("i4", "Sugar", "g", 100, 10, 0.003);
+        boolean threw = false;
+        try { ing.restock(-5); } catch (IllegalArgumentException e) { threw = true; }
+        assertTrue("restock() throws on negative", threw);
+    }
+
+    private static void testIngredientToString() {
+        System.out.println("\nTest 25: Ingredient.toString() contains name");
+        Ingredient ing = new Ingredient("i5", "Butter", "g", 100, 50, 0.01);
+        assertTrue("toString contains name", ing.toString().contains("Butter"));
+    }
+
+    private static void testIngredientSetters() {
+        System.out.println("\nTest 26: Ingredient setExpiryDate and setCostPerUnit work");
+        Ingredient ing = new Ingredient("i6", "Milk", "ml", 500, 100, 0.002);
+        ing.setCostPerUnit(0.005);
+        ing.setExpiryDate(java.time.LocalDate.now().plusDays(3));
+        assertEquals("CostPerUnit updated", 0.005, ing.getCostPerUnit());
+        assertTrue("ExpiryDate set", ing.getExpiryDate() != null);
+    }
+
+    // ---- CustomerOrder model ----------------------------------------- //
+
+    private static void testCustomerOrderComplete() {
+        System.out.println("\nTest 27: CustomerOrder.complete() sets COMPLETED status on success");
+        Recipe recipe = RecipeFactory.createAppetizer("Soup", "Hot soup", makeIngredients(), "baking", 1, 1);
+        CustomerOrder order = CustomerOrderFactory.createForRecipe(recipe);
+        CookingResult result = new CookingResult(true, 80, 30, "Baking", "Good");
+        order.complete(result);
+        assertEquals("Status is COMPLETED", CustomerOrder.Status.COMPLETED, order.getStatus());
+        assertTrue("Satisfaction > 0", order.getSatisfactionScore() > 0);
+    }
+
+    private static void testCustomerOrderFailedStatus() {
+        System.out.println("\nTest 28: CustomerOrder.complete() sets FAILED on unsuccessful result");
+        Recipe recipe = RecipeFactory.createAppetizer("Salad", "Fresh", makeIngredients(), "grilling", 1, 1);
+        CustomerOrder order = CustomerOrderFactory.createForRecipe(recipe);
+        CookingResult result = new CookingResult(false, 20, 30, "Grilling", "Bad");
+        order.complete(result);
+        assertEquals("Status is FAILED", CustomerOrder.Status.FAILED, order.getStatus());
+    }
+
+    private static void testCustomerOrderGetters() {
+        System.out.println("\nTest 29: CustomerOrder getters return correct values");
+        Recipe recipe = RecipeFactory.createAppetizer("Chips", "Fried", makeIngredients(), "frying", 1, 1);
+        CustomerOrder order = CustomerOrderFactory.createForRecipe(recipe);
+        assertTrue("OrderId not null", order.getOrderId() != null);
+        assertTrue("CustomerId not null", order.getCustomerId() != null);
+        assertTrue("CreatedAt not null", order.getCreatedAt() != null);
+        assertTrue("PatienceSeconds > 0", order.getPatienceSeconds() > 0);
+        assertEquals("Initial status PENDING", CustomerOrder.Status.PENDING, order.getStatus());
+    }
+
+    // ---- CookingResult model ----------------------------------------- //
+
+    private static void testCookingResultGetters() {
+        System.out.println("\nTest 30: CookingResult getters return correct values");
+        CookingResult r = new CookingResult(true, 75, 45, "Frying", "Nice!");
+        assertTrue("isSuccess true", r.isSuccess());
+        assertEquals("Score", 75, r.getScore());
+        assertEquals("TimeTaken", 45, r.getTimeTakenSeconds());
+        assertEquals("Method", "Frying", r.getCookingMethod());
+        assertEquals("Feedback", "Nice!", r.getFeedbackMessage());
+        assertTrue("Stars > 0", r.getStarRating() > 0);
+        assertTrue("toString works", r.toString().contains("Frying"));
+    }
+
+    private static void testCookingResultStarRatings() {
+        System.out.println("\nTest 31: CookingResult star rating scales with score");
+        assertEquals("Score 100 = 5 stars", 5, new CookingResult(true, 100, 10, "X", "").getStarRating());
+        assertEquals("Score 80 = 4 stars",  4, new CookingResult(true, 80,  10, "X", "").getStarRating());
+        assertEquals("Score 60 = 3 stars",  3, new CookingResult(true, 60,  10, "X", "").getStarRating());
+        assertEquals("Score 30 = 2 stars",  2, new CookingResult(false, 45, 10, "X", "").getStarRating());
+        assertEquals("Score 10 = 1 star",   1, new CookingResult(false, 10, 10, "X", "").getStarRating());
+    }
+
+    // ---- Cooking strategies low-skill branches ----------------------- //
+
+    private static void testBakingStrategyLowSkillFeedback() {
+        System.out.println("\nTest 32: BakingStrategy gives low score for large skill gap");
+        recipeRealm.cooking.BakingStrategy baking = new recipeRealm.cooking.BakingStrategy();
+        Recipe hardRecipe = RecipeFactory.createDessert("Croissant", "Pastry", makeIngredients(), "baking", 10, 5);
+        CookingResult result = baking.cook(hardRecipe, 1);
+        assertTrue("Score low for huge skill gap", result.getScore() < 60);
+    }
+
+    private static void testGrillingStrategyLowSkillFeedback() {
+        System.out.println("\nTest 33: GrillingStrategy gives lower score for low skill");
+        recipeRealm.cooking.GrillingStrategy grilling = new recipeRealm.cooking.GrillingStrategy();
+        Recipe hardRecipe = RecipeFactory.createMainCourse("Wagyu", "Expensive", makeIngredients(), "grilling", 10, 5);
+        CookingResult expertResult = grilling.cook(hardRecipe, 10);
+        CookingResult noviceResult = grilling.cook(hardRecipe, 1);
+        assertTrue("Novice scores lower than expert", noviceResult.getScore() < expertResult.getScore());
+    }
+
+    private static void testFryingStrategyLowSkillFeedback() {
+        System.out.println("\nTest 34: FryingStrategy gives soggy feedback for low skill");
+        recipeRealm.cooking.FryingStrategy frying = new recipeRealm.cooking.FryingStrategy();
+        Recipe hardRecipe = RecipeFactory.createMainCourse("Tempura", "Battered", makeIngredients(), "frying", 10, 5);
+        CookingResult result = frying.cook(hardRecipe, 1);
+        assertTrue("Low skill frying fails", !result.isSuccess());
+    }
+
+    private static void testSteamingStrategyLowSkillFeedback() {
+        System.out.println("\nTest 35: SteamingStrategy gives bland feedback for low skill");
+        recipeRealm.cooking.SteamingStrategy steaming = new recipeRealm.cooking.SteamingStrategy();
+        Recipe hardRecipe = RecipeFactory.createMainCourse("Sea Bass", "Steamed", makeIngredients(), "steaming", 10, 5);
+        CookingResult result = steaming.cook(hardRecipe, 1);
+        assertTrue("Low skill steaming score < 70", result.getScore() < 70);
+    }
+
+    // ---- Repository coverage ----------------------------------------- //
+
+    private static void testInMemoryRecipeRepositoryUpdate() {
+        System.out.println("\nTest 36: InMemoryRecipeRepository.update() replaces existing recipe");
+        recipeRealm.repository.InMemoryRecipeRepository repo = new recipeRealm.repository.InMemoryRecipeRepository();
+        Recipe r = RecipeFactory.createAppetizer("Soup", "Hot", makeIngredients(), "baking", 1, 1);
+        repo.save(r);
+        repo.update(r); // should not throw
+        assertEquals("Still 1 recipe after update", 1, repo.size());
+    }
+
+    private static void testInMemoryRecipeRepositoryUpdateThrowsOnMissing() {
+        System.out.println("\nTest 37: InMemoryRecipeRepository.update() throws if not found");
+        recipeRealm.repository.InMemoryRecipeRepository repo = new recipeRealm.repository.InMemoryRecipeRepository();
+        Recipe r = RecipeFactory.createAppetizer("Ghost", "Missing", makeIngredients(), "baking", 1, 1);
+        boolean threw = false;
+        try { repo.update(r); } catch (java.util.NoSuchElementException e) { threw = true; }
+        assertTrue("update() throws when recipe not in repo", threw);
+    }
+
+    private static void testInMemoryRecipeRepositoryFindByCategory() {
+        System.out.println("\nTest 38: InMemoryRecipeRepository.findByCategory() filters correctly");
+        recipeRealm.repository.InMemoryRecipeRepository repo = new recipeRealm.repository.InMemoryRecipeRepository();
+        repo.save(RecipeFactory.createAppetizer("A1", "d", makeIngredients(), "baking", 1, 1));
+        repo.save(RecipeFactory.createMainCourse("M1", "d", makeIngredients(), "baking", 1, 1));
+        assertEquals("One appetizer", 1, repo.findByCategory("Appetizer").size());
+        assertEquals("One main course", 1, repo.findByCategory("MainCourse").size());
+    }
+
+    private static void testInventoryRepositoryFindById() {
+        System.out.println("\nTest 39: InventoryRepository.findById() returns correct ingredient");
+        recipeRealm.repository.InventoryRepository repo = new recipeRealm.repository.InventoryRepository();
+        Ingredient ing = new Ingredient("x1", "Pepper", "g", 100, 5, 0.01);
+        repo.save(ing);
+        assertTrue("findById returns ingredient", repo.findById("x1").isPresent());
+        assertTrue("findById missing returns empty", repo.findById("nope").isEmpty());
+    }
+
+    private static void testInventoryRepositoryDelete() {
+        System.out.println("\nTest 40: InventoryRepository.delete() removes ingredient");
+        recipeRealm.repository.InventoryRepository repo = new recipeRealm.repository.InventoryRepository();
+        Ingredient ing = new Ingredient("d1", "Thyme", "g", 50, 5, 0.01);
+        repo.save(ing);
+        repo.delete("d1");
+        assertTrue("Ingredient removed after delete", repo.findById("d1").isEmpty());
+    }
+
+    private static void testInventoryRepositoryConsumeThrowsOnMissing() {
+        System.out.println("\nTest 41: InventoryRepository.consumeIngredients() throws for missing ingredient");
+        recipeRealm.repository.InventoryRepository repo = new recipeRealm.repository.InventoryRepository();
+        Ingredient missing = new Ingredient("miss", "Ghost", "g", 10, 5, 0.01);
+        boolean threw = false;
+        try { repo.consumeIngredients(List.of(missing)); } catch (java.util.NoSuchElementException e) { threw = true; }
+        assertTrue("consumeIngredients throws on missing", threw);
+    }
+
+    private static void testInventoryRepositoryConsumeThrowsOnExpired() {
+        System.out.println("\nTest 42: InventoryRepository.consumeIngredients() throws for expired ingredient");
+        recipeRealm.repository.InventoryRepository repo = new recipeRealm.repository.InventoryRepository();
+        Ingredient expired = IngredientFactory.createPerishable("exp1", "OldMilk", "ml", 500, 100, 0.002,
+                java.time.LocalDate.now().minusDays(1));
+        repo.save(expired);
+        boolean threw = false;
+        try { repo.consumeIngredients(List.of(expired)); } catch (IllegalStateException e) { threw = true; }
+        assertTrue("consumeIngredients throws on expired", threw);
+    }
+
+    private static void testInventoryRepositoryFindLowStock() {
+        System.out.println("\nTest 43: InventoryRepository.findLowStock() returns low stock items");
+        recipeRealm.repository.InventoryRepository repo = new recipeRealm.repository.InventoryRepository();
+        Ingredient low = new Ingredient("low1", "Saffron", "g", 1, 5, 1.0);
+        Ingredient fine = new Ingredient("ok1", "Rice", "g", 1000, 100, 0.001);
+        repo.save(low); repo.save(fine);
+        List<Ingredient> lowStock = repo.findLowStock();
+        assertTrue("Low stock item found", lowStock.stream().anyMatch(i -> i.getName().equals("Saffron")));
+        assertTrue("Fine item not flagged", lowStock.stream().noneMatch(i -> i.getName().equals("Rice")));
+    }
+
+    // ---- Service coverage -------------------------------------------- //
+
+    private static void testInventoryServiceRestockIngredient() {
+        System.out.println("\nTest 44: InventoryService.restockIngredient() increases stock");
+        recipeRealm.repository.InventoryRepository repo = new recipeRealm.repository.InventoryRepository();
+        recipeRealm.service.InventoryService service = new recipeRealm.service.InventoryService(repo);
+        Ingredient ing = new Ingredient("r1", "Yeast", "g", 20, 10, 0.05);
+        service.addIngredient(ing);
+        service.restockIngredient("r1", 50);
+        assertEquals("Stock increased", 70.0, service.getAllIngredients().get(0).getQuantity());
+    }
+
+    private static void testInventoryServiceRestockThrowsOnMissing() {
+        System.out.println("\nTest 45: InventoryService.restockIngredient() throws when not found");
+        recipeRealm.repository.InventoryRepository repo = new recipeRealm.repository.InventoryRepository();
+        recipeRealm.service.InventoryService service = new recipeRealm.service.InventoryService(repo);
+        boolean threw = false;
+        try { service.restockIngredient("nope", 10); } catch (java.util.NoSuchElementException e) { threw = true; }
+        assertTrue("restock throws on missing ingredient", threw);
+    }
+
+    private static void testInventoryServiceHasAllIngredients() {
+        System.out.println("\nTest 46: InventoryService.hasAllIngredients() returns true when stocked");
+        recipeRealm.repository.InventoryRepository repo = new recipeRealm.repository.InventoryRepository();
+        recipeRealm.service.InventoryService service = new recipeRealm.service.InventoryService(repo);
+        Ingredient ing = new Ingredient("h1", "Oil", "ml", 500, 30, 0.005);
+        service.addIngredient(ing);
+        assertTrue("Has ingredient", service.hasAllIngredients(List.of(ing)));
+        Ingredient missing = new Ingredient("h2", "Truffle", "g", 0, 10, 10.0);
+        assertTrue("Missing returns false", !service.hasAllIngredients(List.of(missing)));
+    }
+
+    private static void testInventoryServiceGetLowStock() {
+        System.out.println("\nTest 47: InventoryService.getLowStockIngredients() delegates correctly");
+        recipeRealm.repository.InventoryRepository repo = new recipeRealm.repository.InventoryRepository();
+        recipeRealm.service.InventoryService service = new recipeRealm.service.InventoryService(repo);
+        Ingredient low = new Ingredient("ls1", "Vanilla", "g", 1, 10, 0.5);
+        service.addIngredient(low);
+        assertTrue("Low stock returned", !service.getLowStockIngredients().isEmpty());
+    }
+
+    private static void testOrderServiceHasOrders() {
+        System.out.println("\nTest 48: OrderService.hasOrders() reflects queue state");
+        recipeRealm.observer.KitchenEventPublisher pub = new recipeRealm.observer.KitchenEventPublisher();
+        recipeRealm.repository.InventoryRepository repo = new recipeRealm.repository.InventoryRepository();
+
+        // seed ingredient so consume doesn't fail
+        Ingredient ing = new Ingredient("oi1", "Egg", "pieces", 100, 2, 0.30);
+        repo.save(ing);
+
+        recipeRealm.service.OrderService svc = new recipeRealm.service.OrderService(pub, repo);
+        assertTrue("Empty queue = no orders", !svc.hasOrders());
+
+        Recipe recipe = RecipeFactory.createAppetizer("Omelette", "Egg dish",
+                List.of(new Ingredient("oi1", "Egg", "pieces", 100, 2, 0.30)), "frying", 1, 1);
+        CustomerOrder order = CustomerOrderFactory.createForRecipe(recipe);
+        svc.enqueueOrder(order);
+        assertTrue("Has orders after enqueue", svc.hasOrders());
+    }
+
+    private static void testOrderServiceGetCompletedOrders() {
+        System.out.println("\nTest 49: OrderService.getCompletedOrders() grows after processing");
+        recipeRealm.observer.KitchenEventPublisher pub = new recipeRealm.observer.KitchenEventPublisher();
+        recipeRealm.repository.InventoryRepository repo = new recipeRealm.repository.InventoryRepository();
+        Ingredient ing = new Ingredient("co1", "Egg", "pieces", 100, 2, 0.30);
+        repo.save(ing);
+
+        recipeRealm.service.OrderService svc = new recipeRealm.service.OrderService(pub, repo);
+        Recipe recipe = RecipeFactory.createAppetizer("Scrambled", "Eggs",
+                List.of(new Ingredient("co1", "Egg", "pieces", 100, 2, 0.30)), "baking", 1, 1);
+        svc.enqueueOrder(CustomerOrderFactory.createForRecipe(recipe));
+        svc.processNextOrder(5);
+        assertEquals("One completed order", 1, svc.getCompletedOrders().size());
+    }
+
+    private static void testRecipeServiceFindById() {
+        System.out.println("\nTest 50: RecipeService.findById() returns correct recipe");
+        recipeRealm.repository.InMemoryRecipeRepository repo = new recipeRealm.repository.InMemoryRecipeRepository();
+        recipeRealm.service.RecipeService service = new recipeRealm.service.RecipeService(repo);
+        Recipe r = RecipeFactory.createAppetizer("Beet Salad", "Fresh beets", makeIngredients(), "grilling", 1, 1);
+        service.addRecipe(r);
+        assertTrue("findById returns recipe", service.findById(r.getId()).isPresent());
+        assertTrue("findById missing returns empty", service.findById("nope").isEmpty());
+    }
+
+    private static void testRecipeServiceGetByCategory() {
+        System.out.println("\nTest 51: RecipeService.getByCategory() filters correctly");
+        recipeRealm.repository.InMemoryRecipeRepository repo = new recipeRealm.repository.InMemoryRecipeRepository();
+        recipeRealm.service.RecipeService service = new recipeRealm.service.RecipeService(repo);
+        service.addRecipe(RecipeFactory.createDessert("Cake", "Sweet", makeIngredients(), "baking", 1, 1));
+        service.addRecipe(RecipeFactory.createAppetizer("Bruschetta2", "Crunchy", makeIngredients(), "grilling", 1, 1));
+        assertEquals("One dessert", 1, service.getByCategory("Dessert").size());
+        assertEquals("One appetizer", 1, service.getByCategory("Appetizer").size());
+    }
+
+    private static void testRecipeServiceRemove() {
+        System.out.println("\nTest 52: RecipeService.removeRecipe() removes by id");
+        recipeRealm.repository.InMemoryRecipeRepository repo = new recipeRealm.repository.InMemoryRecipeRepository();
+        recipeRealm.service.RecipeService service = new recipeRealm.service.RecipeService(repo);
+        Recipe r = RecipeFactory.createAppetizer("Tempura2", "Fried", makeIngredients(), "frying", 1, 1);
+        service.addRecipe(r);
+        service.removeRecipe(r.getId());
+        assertEquals("Repo empty after remove", 0, service.getTotalRecipeCount());
+    }
+
+    private static void testRecipeServiceRemoveThrowsOnMissing() {
+        System.out.println("\nTest 53: RecipeService.removeRecipe() throws when not found");
+        recipeRealm.repository.InMemoryRecipeRepository repo = new recipeRealm.repository.InMemoryRecipeRepository();
+        recipeRealm.service.RecipeService service = new recipeRealm.service.RecipeService(repo);
+        boolean threw = false;
+        try { service.removeRecipe("nonexistent"); } catch (java.util.NoSuchElementException e) { threw = true; }
+        assertTrue("removeRecipe throws on missing", threw);
+    }
+
+    // ---- Observer / Publisher coverage ------------------------------- //
+
+    private static void testKitchenEventPublisherIgnoresNullAndDuplicates() {
+        System.out.println("\nTest 54: KitchenEventPublisher ignores null and duplicate registrations");
+        recipeRealm.observer.KitchenEventPublisher pub = new recipeRealm.observer.KitchenEventPublisher();
+        List<Integer> count = new ArrayList<>();
+        recipeRealm.observer.KitchenObserver obs = (o, r) -> count.add(1);
+        pub.registerObserver(obs);
+        pub.registerObserver(obs);   // duplicate — should be ignored
+        pub.registerObserver(null);  // null — should be ignored
+        Recipe recipe = RecipeFactory.createAppetizer("X", "X", makeIngredients(), "baking", 1, 1);
+        pub.notifyDishCompleted(CustomerOrderFactory.createForRecipe(recipe),
+                new CookingResult(true, 80, 10, "Baking", "OK"));
+        assertEquals("Observer fired exactly once", 1, count.size());
+    }
+
+    private static void testStockAlertObserverCollectsAndClears() {
+        System.out.println("\nTest 55: StockAlertObserver collects alerts and clears them");
+        recipeRealm.observer.StockAlertObserver obs = new recipeRealm.observer.StockAlertObserver();
+        Ingredient ing = new Ingredient("sa1", "Salt", "g", 10, 5, 0.01);
+        obs.onLowStock(ing, 10);
+        obs.onStockExpired(ing);
+        assertEquals("Two alerts collected", 2, obs.getAlerts().size());
+        obs.clearAlerts();
+        assertEquals("Alerts cleared", 0, obs.getAlerts().size());
+    }
+
+    private static void testOrderFulfillmentObserverSpend() {
+        System.out.println("\nTest 56: OrderFulfillmentObserver.spend() reduces earnings");
+        recipeRealm.observer.OrderFulfillmentObserver obs = new recipeRealm.observer.OrderFulfillmentObserver();
+        Recipe recipe = RecipeFactory.createMainCourse("Steak", "Beef", makeIngredients(), "grilling", 3, 2);
+        CustomerOrder order = CustomerOrderFactory.createForRecipe(recipe);
+        CookingResult result = new CookingResult(true, 100, 30, "Grilling", "Perfect");
+        obs.onDishCompleted(order, result);
+        double before = obs.getTotalEarnings();
+        obs.spend(5.0);
+        assertTrue("Spend reduces earnings", obs.getTotalEarnings() < before);
+    }
+
+    // ---- GameManager coverage ---------------------------------------- //
+
+    private static void testGameManagerGetters() {
+        System.out.println("\nTest 57: GameManager getters return correct values after seeding");
+        GameManager game = new GameManager(4);
+        game.seedDefaultData();
+        assertTrue("Total earnings starts at 0", game.getTotalEarnings() == 0.0);
+        assertEquals("Average satisfaction starts at 0", 0, game.getAverageSatisfaction());
+        assertEquals("Queue starts empty", 0, game.getOrderQueueSize());
+        assertTrue("Recipes available", game.getAllRecipes().size() > 0);
+    }
+
+    private static void testGameManagerSpendFunds() {
+        System.out.println("\nTest 58: GameManager.spendFunds() reduces total earnings");
+        GameManager game = new GameManager(5);
+        game.seedDefaultData();
+        game.submitRandomOrder();
+        game.processNextOrder();
+        double after = game.getTotalEarnings();
+        game.spendFunds(1.0);
+        assertTrue("spendFunds reduces earnings", game.getTotalEarnings() < after);
+    }
+
+    private static void testGameManagerLevelUpAtMaxDoesNothing() {
+        System.out.println("\nTest 59: GameManager.levelUp() at max level 10 stays at 10");
+        GameManager game = new GameManager(10);
+        game.levelUp();
+        game.levelUp();
+        assertEquals("Still at 10", 10, game.getPlayerSkillLevel());
+    }
+
+    // ---- Decorator: ExtraSpicy and DoubleServing alone --------------- //
+
+    private static void testExtraSpicyDecoratorAlone() {
+        System.out.println("\nTest 60: ExtraSpicyDecorator increases complexity by 1");
+        Recipe base = RecipeFactory.createAppetizer("Wings", "Spicy wings", makeIngredients(), "frying", 2, 2);
+        Recipe spicy = new recipeRealm.decorator.ExtraSpicyDecorator(base);
+        assertEquals("Complexity +1", base.getComplexity() + 1, spicy.getComplexity());
+        assertTrue("Name contains Extra Spicy", spicy.getName().contains("Extra Spicy"));
+    }
+
+    private static void testDoubleServingDecoratorAlone() {
+        System.out.println("\nTest 61: DoubleServingDecorator doubles prep time");
+        Recipe base = RecipeFactory.createMainCourse("Pasta", "Carbonara", makeIngredients(), "baking", 3, 2);
+        Recipe doubled = new recipeRealm.decorator.DoubleServingDecorator(base);
+        assertEquals("Prep time doubled", base.getPreparationTimeSeconds() * 2, doubled.getPreparationTimeSeconds());
+        assertTrue("Name contains Double", doubled.getName().contains("Double"));
+    }
+
+    private static void testExtraSpicyComplexityCappedAt5() {
+        System.out.println("\nTest 62: ExtraSpicyDecorator caps complexity at 5");
+        Recipe base = RecipeFactory.createMainCourse("Extreme", "Hard", makeIngredients(), "grilling", 5, 5);
+        Recipe spicy = new recipeRealm.decorator.ExtraSpicyDecorator(base);
+        assertEquals("Complexity capped at 5", 5, spicy.getComplexity());
+    }
+
+    // ================================================================== //
     // Runner                                                              //
     // ================================================================== //
 
@@ -443,6 +871,66 @@ public class RecipeRealmTestSuite {
         testGameManagerSeededDataLoadedCorrectly();
         testGameManagerLevelUpCapsAtTen();
         testGameManagerSubmitAndProcessOrder();
+
+        // Coverage: Ingredient
+        testIngredientConsumeReducesQuantity();
+        testIngredientConsumeThrowsWhenUnavailable();
+        testIngredientRestockIncreasesQuantity();
+        testIngredientRestockThrowsOnNegative();
+        testIngredientToString();
+        testIngredientSetters();
+
+        // Coverage: CustomerOrder
+        testCustomerOrderComplete();
+        testCustomerOrderFailedStatus();
+        testCustomerOrderGetters();
+
+        // Coverage: CookingResult
+        testCookingResultGetters();
+        testCookingResultStarRatings();
+
+        // Coverage: Cooking strategies low-skill
+        testBakingStrategyLowSkillFeedback();
+        testGrillingStrategyLowSkillFeedback();
+        testFryingStrategyLowSkillFeedback();
+        testSteamingStrategyLowSkillFeedback();
+
+        // Coverage: Repository
+        testInMemoryRecipeRepositoryUpdate();
+        testInMemoryRecipeRepositoryUpdateThrowsOnMissing();
+        testInMemoryRecipeRepositoryFindByCategory();
+        testInventoryRepositoryFindById();
+        testInventoryRepositoryDelete();
+        testInventoryRepositoryConsumeThrowsOnMissing();
+        testInventoryRepositoryConsumeThrowsOnExpired();
+        testInventoryRepositoryFindLowStock();
+
+        // Coverage: Service
+        testInventoryServiceRestockIngredient();
+        testInventoryServiceRestockThrowsOnMissing();
+        testInventoryServiceHasAllIngredients();
+        testInventoryServiceGetLowStock();
+        testOrderServiceHasOrders();
+        testOrderServiceGetCompletedOrders();
+        testRecipeServiceFindById();
+        testRecipeServiceGetByCategory();
+        testRecipeServiceRemove();
+        testRecipeServiceRemoveThrowsOnMissing();
+
+        // Coverage: Observer
+        testKitchenEventPublisherIgnoresNullAndDuplicates();
+        testStockAlertObserverCollectsAndClears();
+        testOrderFulfillmentObserverSpend();
+
+        // Coverage: GameManager
+        testGameManagerGetters();
+        testGameManagerSpendFunds();
+        testGameManagerLevelUpAtMaxDoesNothing();
+
+        // Coverage: Decorators
+        testExtraSpicyDecoratorAlone();
+        testDoubleServingDecoratorAlone();
+        testExtraSpicyComplexityCappedAt5();
 
         System.out.println("\n==========================================");
         System.out.printf("  Results: %d passed, %d failed%n", passed, failed);
