@@ -28,10 +28,10 @@ public class SteamingStrategy implements CookingStrategy {
     }
 
     private String buildFeedback(int score, boolean precisionBonus) {
-        if (precisionBonus && score >= 90) return "Perfectly steamed — tender, flavourful, and delicate!";
+        if (precisionBonus && score >= 90) return "Perfectly steamed";
         if (score >= 70) return "Well steamed with a pleasant, clean flavour.";
         if (score >= 50) return "Cooked through, though a bit bland and watery.";
-        return "Hopelessly waterlogged — the ingredients have lost all character.";
+        return "Hopelessly waterlogged";
     }
 
     @Override
