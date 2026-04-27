@@ -40,15 +40,37 @@ public class Ingredient {
         this.quantity += amount;
     }
 
-    public String getId()              { return id; }
-    public String getName()            { return name; }
-    public String getUnit()            { return unit; }
-    public double getQuantity()        { return quantity; }
-    public double getRequiredAmount()  { return requiredAmount; }
-    public double getCostPerUnit()     { return costPerUnit; }
-    public LocalDate getExpiryDate()   { return expiryDate; }
-    public void setExpiryDate(LocalDate date) { this.expiryDate = date; }
-    public void setCostPerUnit(double cost)   { this.costPerUnit = cost; }
+    public String getId(){ 
+        return id; }
+
+    public String getName(){ 
+        return name; 
+    }
+    public String getUnit(){
+         return unit; 
+        }
+    public double getQuantity(){ 
+        return quantity; 
+    }
+    public double getRequiredAmount() { 
+        return requiredAmount; 
+
+    }
+    public double getCostPerUnit(){
+         return costPerUnit; 
+        }
+
+    public LocalDate getExpiryDate(){
+         return expiryDate; 
+        }
+
+    public void setExpiryDate(LocalDate date) {
+         this.expiryDate = date; 
+        }
+
+    public void setCostPerUnit(double cost) {
+         this.costPerUnit = cost; 
+        }
 
     @Override
     public String toString() {

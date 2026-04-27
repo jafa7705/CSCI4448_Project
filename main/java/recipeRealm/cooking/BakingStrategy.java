@@ -34,8 +34,12 @@ public class BakingStrategy implements CookingStrategy {
     }
 
     @Override
-    public String getMethodName() { return "Baking"; }
+    public String getMethodName() { 
+        return "Baking"; 
+    }
 
     @Override
-    public int getBaseTimeSeconds() { return BASE_TIME_SECONDS; }
+    public int getBaseTimeSeconds() { 
+        return BASE_TIME_SECONDS; 
+    }
 }

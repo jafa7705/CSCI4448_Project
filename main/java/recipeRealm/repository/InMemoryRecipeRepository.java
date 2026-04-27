@@ -49,5 +49,7 @@ public class InMemoryRecipeRepository implements StorageRepository<String, Recip
                 .collect(Collectors.toList());
     }
 
-    public int size() { return store.size(); }
+    public int size() { 
+        return store.size(); 
+    }
 }

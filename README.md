@@ -8,15 +8,6 @@ Run swing mod with gradle run
 
 Test coverage is in images/TestCoverage.png
 
-Run in terminal command java -cp out recipeRealm.TerminalGame
-
-Run in UI java -cp out recipeRealm.Main --swing
-
-Test coverage cmds
-rm -rf out && mkdir out && find ./main -name "*.java" > sources.txt && javac --release 21 -d out @sources.txt
-java -javaagent:jacoco/lib/jacocoagent.jar=destfile=jacoco.exec -cp out recipeRealm.test.RecipeRealmTestSuite
-java -jar jacoco/lib/jacococli.jar report jacoco.exec --classfiles out --sourcefiles ./main/java --html coverage-report
-open coverage-report/index.html
 
 
 # Design Patterns
@@ -34,3 +25,11 @@ open coverage-report/index.html
 - The order fullfillemnt observer recievs the order and the result then calculates the earnings.
 - Satisftaction observer calcualtes and adds up the average customer satisfaction.
 - A customer observer will also later be implemented. 
+
+## Repository Pattern
+- StorageRepository Defines save delete and find methods that InMemory and Inventory need to follow. T allows for different types of objects
+- InMemory stores all of the recipes and makes it easy to grab ones that are needed adds a few more methods that allow for better lookups
+- Inventory holds all of the ingredients, holds an observer stock alert observer and lets them know whenever an ingredient is low or going bad
+
+# Service Pattern
+- Provicde the seem between the UI and the repository patter. Holds instances of the repo pattern. Mkaes it easy for swing to interact with the database as well as run game logic

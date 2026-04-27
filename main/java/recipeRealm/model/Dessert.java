@@ -6,8 +6,7 @@ import java.util.List;
 
 public class Dessert extends BaseRecipe {
 
-    public Dessert(String name, String description, List<Ingredient> ingredients,
-                   CookingStrategy cookingStrategy, int requiredSkillLevel, int complexity) {
+    public Dessert(String name, String description, List<Ingredient> ingredients, CookingStrategy cookingStrategy, int requiredSkillLevel, int complexity) {
         super(name, description, ingredients, cookingStrategy, requiredSkillLevel,
               complexity, 45 + complexity * 20);
     }

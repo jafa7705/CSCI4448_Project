@@ -42,12 +42,27 @@ public class CustomerOrder {
         this.satisfactionScore = (int) (result.getScore() * 0.7 + timelinessRatio * 30);
     }
 
-    public String getOrderId()            { return orderId; }
-    public String getCustomerId()         { return customerId; }
-    public Recipe getRequestedRecipe()    { return requestedRecipe; }
-    public Instant getCreatedAt()         { return createdAt; }
-    public int getPatienceSeconds()       { return patienceSeconds; }
-    public Status getStatus()             { return status; }
-    public int getSatisfactionScore()     { return satisfactionScore; }
-    public void setStatus(Status status)  { this.status = status; }
+    public String getOrderId(){ 
+        return orderId; 
+    }
+    public String getCustomerId(){ 
+        return customerId; 
+    }
+    public Recipe getRequestedRecipe(){ 
+        return requestedRecipe; 
+    }
+    public Instant getCreatedAt(){ 
+        return createdAt;
+     }
+    public int getPatienceSeconds(){ 
+        return patienceSeconds; 
+    }
+    public Status getStatus(){ 
+        return status; 
+    }
+    public int getSatisfactionScore(){ 
+        return satisfactionScore; 
+    }
+    public void setStatus(Status status){ 
+        this.status = status; }
 }

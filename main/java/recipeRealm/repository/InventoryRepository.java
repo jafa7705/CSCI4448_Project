@@ -13,8 +13,12 @@ public class InventoryRepository implements StorageRepository<String, Ingredient
     private final Map<String, Ingredient> store = new LinkedHashMap<>();
     private final List<InventoryObserver> observers = new ArrayList<>();
 
-    public void addObserver(InventoryObserver observer) { observers.add(observer); }
-    public void removeObserver(InventoryObserver observer) { observers.remove(observer); }
+    public void addObserver(InventoryObserver observer) { 
+        observers.add(observer); 
+    }
+    public void removeObserver(InventoryObserver observer) { 
+        observers.remove(observer);
+    }
 
     @Override
     public void save(Ingredient ingredient) {

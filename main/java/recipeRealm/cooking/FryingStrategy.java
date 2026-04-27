@@ -27,10 +27,10 @@ public class FryingStrategy implements CookingStrategy {
     }
 
     private String buildFeedback(int score) {
-        if (score >= 90) return "Crispy perfection — the oil temp was spot on!";
-        if (score >= 70) return "Nicely fried, slightly greasy but tasty.";
-        if (score >= 50) return "A bit soggy — the oil wasn't hot enough.";
-        return "Oil splattered everywhere. The dish is ruined!";
+        if (score >= 90) return "the oil temp was spot on!";
+        if (score >= 70) return "slightly greasy but tasty.";
+        if (score >= 50) return "the oil wasn't hot enough.";
+        return "The dish is ruined!";
     }
 
     @Override

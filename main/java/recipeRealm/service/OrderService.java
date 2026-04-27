@@ -19,8 +19,7 @@ public class OrderService {
     private final Deque<CustomerOrder> orderQueue = new ArrayDeque<>();
     private final List<CustomerOrder> completedOrders = new ArrayList<>();
 
-    public OrderService(KitchenEventPublisher eventPublisher,
-                        InventoryRepository inventoryRepository) {
+    public OrderService(KitchenEventPublisher eventPublisher, InventoryRepository inventoryRepository) {
         this.eventPublisher = eventPublisher;
         this.inventoryRepository = inventoryRepository;
     }
@@ -56,7 +55,13 @@ public class OrderService {
         return result;
     }
 
-    public int getQueueSize()                  { return orderQueue.size(); }
-    public List<CustomerOrder> getCompletedOrders() { return new ArrayList<>(completedOrders); }
-    public boolean hasOrders()                 { return !orderQueue.isEmpty(); }
+    public int getQueueSize(){ 
+        return orderQueue.size(); 
+    }
+    public List<CustomerOrder> getCompletedOrders(){ 
+        return new ArrayList<>(completedOrders); 
+
+    }
+    public boolean hasOrders(){ 
+        return !orderQueue.isEmpty(); }
 }
