@@ -26,11 +26,11 @@ public class BakingStrategy implements CookingStrategy {
     }
 
     private String buildFeedback(int score, int skillGap) {
-        if (score >= 90) return "Perfectly baked — golden crust, moist inside!";
-        if (score >= 70) return "Nicely baked, but the edges are a bit dark.";
-        if (score >= 50) return "Edible, though the centre is slightly underdone.";
-        if (skillGap > 3) return "Burned! You need more skill before attempting this recipe.";
-        return "Catastrophically underbaked — still raw inside.";
+        if (score >= 90) return "Perfectly baked";
+        if (score >= 70) return "Nicely baked";
+        if (score >= 50) return "Edible";
+        if (skillGap > 3) return "Burned!";
+        return "Catastrophically underbaked";
     }
 
     @Override
