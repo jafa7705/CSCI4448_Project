@@ -2,11 +2,7 @@ package recipeRealm.decorator;
 
 import recipeRealm.model.Recipe;
 
-/**
- * Decorator that produces a gluten-free version of a recipe.
- * Adds a $3.00 surcharge and extends preparation time by 10 seconds
- * (gluten-free substitutes require extra care during prep).
- */
+
 public class GlutenFreeDecorator extends RecipeDecorator {
 
     public GlutenFreeDecorator(Recipe recipe) {

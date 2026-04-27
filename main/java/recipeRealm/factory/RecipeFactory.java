@@ -13,14 +13,7 @@ import recipeRealm.model.Recipe;
 
 import java.util.List;
 
-/**
- * Factory Pattern: RecipeFactory.
- *
- * Creates fully wired Recipe instances without exposing the concrete model
- * subtypes (Appetizer, MainCourse, Dessert) or the CookingStrategy resolution
- * logic to calling code. Callers specify a human-readable cooking method string
- * ("baking", "frying", "grilling", "steaming") and the factory handles the rest.
- */
+
 public class RecipeFactory {
 
     private RecipeFactory() {}
@@ -49,9 +42,6 @@ public class RecipeFactory {
         return new Dessert(name, description, ingredients, strategy, skillLevel, complexity);
     }
 
-    // ------------------------------------------------------------------ //
-    // Private helpers                                                      //
-    // ------------------------------------------------------------------ //
 
     private static CookingStrategy resolveStrategy(String cookingMethod) {
         return switch (cookingMethod.toLowerCase()) {

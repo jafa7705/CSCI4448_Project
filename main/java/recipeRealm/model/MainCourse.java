@@ -3,11 +3,7 @@ package recipeRealm.model;
 import recipeRealm.cooking.CookingStrategy;
 import java.util.List;
 
-/**
- * Concrete recipe subtype representing a main course.
- * Main courses take longer to prepare (60 + complexity × 15 seconds) and
- * command a higher price ($12.00 + complexity × $2.50).
- */
+
 public class MainCourse extends BaseRecipe {
 
     public MainCourse(String name, String description, List<Ingredient> ingredients,

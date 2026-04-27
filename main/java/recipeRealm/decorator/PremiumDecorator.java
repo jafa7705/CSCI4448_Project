@@ -2,10 +2,7 @@ package recipeRealm.decorator;
 
 import recipeRealm.model.Recipe;
 
-/**
- * Decorator that upgrades a recipe to a "Premium" version.
- * Multiplies the price by 1.5× and raises the required skill level by 1.
- */
+
 public class PremiumDecorator extends RecipeDecorator {
 
     public PremiumDecorator(Recipe recipe) {

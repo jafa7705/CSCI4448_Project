@@ -13,20 +13,12 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Hand-rolled test suite for Recipe Realm (no external test framework).
- *
- * Each test method is self-contained and prints PASS / FAIL. The main()
- * method runs all tests and exits with code 1 if any test fails, making
- * this suitable for use in a CI script.
- */
+
 public class RecipeRealmTestSuite {
 
     private static int passed = 0, failed = 0;
 
-    // ------------------------------------------------------------------ //
-    // Micro-assertion helpers                                              //
-    // ------------------------------------------------------------------ //
+
 
     private static void assertTrue(String label, boolean condition) {
         if (condition) {
@@ -43,9 +35,6 @@ public class RecipeRealmTestSuite {
                 expected.equals(actual));
     }
 
-    // ------------------------------------------------------------------ //
-    // Shared fixture helpers                                               //
-    // ------------------------------------------------------------------ //
 
     private static List<Ingredient> makeIngredients() {
         Ingredient egg = new Ingredient("ing-001", "Egg", "pieces", 10, 2, 0.30);
@@ -54,11 +43,7 @@ public class RecipeRealmTestSuite {
         return list;
     }
 
-    // ================================================================== //
-    // Tests                                                               //
-    // ================================================================== //
-
-    // ---- Strategy Pattern -------------------------------------------- //
+ 
 
     private static void testBakingStrategyScoreScalesWithSkill() {
         System.out.println("\nTest 1: BakingStrategy scores scale with skill level");
@@ -77,7 +62,7 @@ public class RecipeRealmTestSuite {
     private static void testFryingStrategyBonusForHighSkill() {
         System.out.println("\nTest 2: FryingStrategy scores higher when skill exceeds requirement");
         FryingStrategy frying = new FryingStrategy();
-        // Use a recipe requiring skill 6 so that skill-9 gets the bonus but skill-3 doesn't
+
         Recipe hardRecipe = RecipeFactory.createMainCourse(
                 "Tempura", "Delicate battered fry", makeIngredients(), "frying", 6, 2);
 

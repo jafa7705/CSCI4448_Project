@@ -192,7 +192,7 @@ public class SwingGame {
         return card;
     }
 
-    // ---- Bottom bar -------------------------------------------------- //
+    //Bottom bar
 
     private JPanel buildBottomBar() {
         JPanel bar = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 8));
@@ -202,9 +202,9 @@ public class SwingGame {
         return bar;
     }
 
-    // ------------------------------------------------------------------ //
-    // Button wiring                                                       //
-    // ------------------------------------------------------------------ //
+
+    // Button wiring
+
 
     private void wireButtons() {
         btnNewOrder.addActionListener(e -> handleNewOrder());
@@ -215,9 +215,9 @@ public class SwingGame {
         setCookingButtonsEnabled(false);
     }
 
-    // ------------------------------------------------------------------ //
-    // Handlers                                                            //
-    // ------------------------------------------------------------------ //
+
+    // Handlers 
+
 
     private void handleNewOrder() {
         List<Recipe> available = game.getRecipeService().getAvailableRecipes(game.getPlayerSkillLevel());

@@ -2,10 +2,6 @@ package recipeRealm.decorator;
 
 import recipeRealm.model.Recipe;
 
-/**
- * Decorator that creates a double-serving version of a recipe.
- * Doubles both the price and the preparation time.
- */
 public class DoubleServingDecorator extends RecipeDecorator {
 
     public DoubleServingDecorator(Recipe recipe) {

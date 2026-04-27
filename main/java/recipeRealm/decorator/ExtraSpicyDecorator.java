@@ -2,10 +2,7 @@ package recipeRealm.decorator;
 
 import recipeRealm.model.Recipe;
 
-/**
- * Decorator that adds an "Extra Spicy" variant to any recipe.
- * Increases price by $2.00 and bumps complexity by 1 (capped at 5).
- */
+
 public class ExtraSpicyDecorator extends RecipeDecorator {
 
     public ExtraSpicyDecorator(Recipe recipe) {

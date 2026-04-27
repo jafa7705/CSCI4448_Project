@@ -3,11 +3,7 @@ package recipeRealm.model;
 import recipeRealm.cooking.CookingStrategy;
 import java.util.List;
 
-/**
- * Concrete recipe subtype representing a dessert.
- * Desserts require moderate preparation time (45 + complexity × 20 seconds)
- * and are priced at $7.00 + complexity × $1.80.
- */
+
 public class Dessert extends BaseRecipe {
 
     public Dessert(String name, String description, List<Ingredient> ingredients,

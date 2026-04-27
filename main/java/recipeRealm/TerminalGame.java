@@ -14,16 +14,7 @@ import recipeRealm.service.RecipeService;
 import java.util.List;
 import java.util.Scanner;
 
-/**
- * TerminalGame — interactive terminal front-end for Recipe Realm.
- *
- * Drives the GameManager via a Scanner menu loop so a human can actually
- * play the game without a JavaFX UI. All game logic lives in GameManager
- * and its subsystems; this class only handles I/O.
- *
- * Run with:
- *   java -cp out recipeRealm.TerminalGame
- */
+
 public class TerminalGame {
 
     private static final String DIVIDER  = "─────────────────────────────────────────";
@@ -42,9 +33,6 @@ public class TerminalGame {
         game.seedDefaultData();
     }
 
-    // ------------------------------------------------------------------ //
-    // Entry point                                                          //
-    // ------------------------------------------------------------------ //
 
     public static void main(String[] args) {
         new TerminalGame().run();
@@ -70,9 +58,6 @@ public class TerminalGame {
         scanner.close();
     }
 
-    // ------------------------------------------------------------------ //
-    // Splash / menus                                                       //
-    // ------------------------------------------------------------------ //
 
     private void printSplash() {
         System.out.println();
@@ -117,9 +102,6 @@ public class TerminalGame {
         System.out.print("  > ");
     }
 
-    // ------------------------------------------------------------------ //
-    // Actions                                                              //
-    // ------------------------------------------------------------------ //
 
     private void handleTakeOrder() {
         System.out.println();
@@ -134,7 +116,7 @@ public class TerminalGame {
             return;
         }
 
-        // Show the incoming order
+
         CustomerOrder order = CustomerOrderFactory.createRandom(available);
         Recipe recipe = order.getRequestedRecipe();
 
@@ -148,7 +130,7 @@ public class TerminalGame {
         System.out.printf("  Patience: %d seconds%n", order.getPatienceSeconds());
         System.out.println();
 
-        // Optional decoration
+
         Recipe finalRecipe = offerDecoration(recipe);
         if (finalRecipe != recipe) {
             // Rebuild the order with the decorated recipe
@@ -165,7 +147,7 @@ public class TerminalGame {
             return;
         }
 
-        // Enqueue and process
+
         game.getOrderService().enqueueOrder(order);
         System.out.println();
         System.out.println("  Cooking...");
@@ -333,9 +315,6 @@ public class TerminalGame {
         return false;
     }
 
-    // ------------------------------------------------------------------ //
-    // Progression                                                         //
-    // ------------------------------------------------------------------ //
 
     private void checkLevelUp() {
         int current = game.getPlayerSkillLevel();
@@ -362,9 +341,6 @@ public class TerminalGame {
         return XP_THRESHOLDS[current];
     }
 
-    // ------------------------------------------------------------------ //
-    // Final summary                                                        //
-    // ------------------------------------------------------------------ //
 
     private void printFinalSummary() {
         System.out.println();

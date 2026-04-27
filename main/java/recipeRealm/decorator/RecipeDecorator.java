@@ -7,16 +7,7 @@ import recipeRealm.model.Recipe;
 
 import java.util.List;
 
-/**
- * Decorator Pattern: Abstract base decorator for Recipe.
- *
- * Wraps a Recipe and delegates all method calls to the wrapped instance.
- * Concrete subclasses override only the methods they wish to modify
- * (e.g., getName, getBasePrice, getComplexity) without touching the rest.
- *
- * This avoids combinatorial explosion of subclasses — instead of creating
- * PremiumSpicyDoubleServing as a dedicated class, decorators stack freely.
- */
+
 public abstract class RecipeDecorator implements Recipe {
 
     protected final Recipe wrapped;
