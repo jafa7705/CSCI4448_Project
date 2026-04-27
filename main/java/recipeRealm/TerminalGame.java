@@ -14,7 +14,7 @@ import recipeRealm.service.RecipeService;
 import java.util.List;
 import java.util.Scanner;
 
-
+ // Run cmd java -cp out recipeRealm.TerminalGame
 public class TerminalGame {
 
     private static final String DIVIDER  = "─────────────────────────────────────────";
@@ -23,7 +23,6 @@ public class TerminalGame {
     private final GameManager game;
     private final Scanner scanner;
 
-    // XP needed to reach each skill level (cumulative orders completed)
     private static final int[] XP_THRESHOLDS = { 0, 3, 7, 12, 18, 25, 33, 42, 52, 63 };
     private int ordersCompleted = 0;
 
@@ -32,7 +31,6 @@ public class TerminalGame {
         this.scanner = new Scanner(System.in);
         game.seedDefaultData();
     }
-
 
     public static void main(String[] args) {
         new TerminalGame().run();
@@ -102,7 +100,7 @@ public class TerminalGame {
         System.out.print("  > ");
     }
 
-
+    
     private void handleTakeOrder() {
         System.out.println();
         System.out.println(DIVIDER);
@@ -115,7 +113,6 @@ public class TerminalGame {
             System.out.println();
             return;
         }
-
 
         CustomerOrder order = CustomerOrderFactory.createRandom(available);
         Recipe recipe = order.getRequestedRecipe();
@@ -130,10 +127,8 @@ public class TerminalGame {
         System.out.printf("  Patience: %d seconds%n", order.getPatienceSeconds());
         System.out.println();
 
-
         Recipe finalRecipe = offerDecoration(recipe);
         if (finalRecipe != recipe) {
-            // Rebuild the order with the decorated recipe
             order = CustomerOrderFactory.createForRecipe(finalRecipe);
         }
 
@@ -146,7 +141,6 @@ public class TerminalGame {
             System.out.println("  Order skipped.\n");
             return;
         }
-
 
         game.getOrderService().enqueueOrder(order);
         System.out.println();
@@ -315,7 +309,7 @@ public class TerminalGame {
         return false;
     }
 
-
+   
     private void checkLevelUp() {
         int current = game.getPlayerSkillLevel();
         if (current >= 10) return;
@@ -341,7 +335,7 @@ public class TerminalGame {
         return XP_THRESHOLDS[current];
     }
 
-
+   
     private void printFinalSummary() {
         System.out.println();
         System.out.println("  ╔══════════════════════════════════════╗");
@@ -352,7 +346,7 @@ public class TerminalGame {
         System.out.printf("  Avg satisfaction:    %d%%%n", game.getAverageSatisfaction());
         System.out.printf("  Final skill level:   %d / 10%n", game.getPlayerSkillLevel());
         System.out.println();
-        System.out.println("  Thanks for playing Recipe Realm!");
+        System.out.println("  Thanks for playing!");
         System.out.println();
     }
 

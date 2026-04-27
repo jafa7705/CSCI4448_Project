@@ -13,7 +13,6 @@ import recipeRealm.model.Recipe;
 
 import java.util.List;
 
-
 public class RecipeFactory {
 
     private RecipeFactory() {}

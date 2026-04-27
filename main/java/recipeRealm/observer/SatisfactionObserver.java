@@ -3,7 +3,6 @@ package recipeRealm.observer;
 import recipeRealm.model.CookingResult;
 import recipeRealm.model.CustomerOrder;
 
-
 public class SatisfactionObserver implements KitchenObserver {
 
     private int totalOrders = 0;

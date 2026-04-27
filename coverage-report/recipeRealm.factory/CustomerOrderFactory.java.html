@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CustomerOrderFactory.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JaCoCo Coverage Report</a> &gt; <a href="index.source.html" class="el_package">recipeRealm.factory</a> &gt; <span class="el_source">CustomerOrderFactory.java</span></div><h1>CustomerOrderFactory.java</h1><pre class="source lang-java linenums">package recipeRealm.factory;
+
+import recipeRealm.model.CustomerOrder;
+import recipeRealm.model.Recipe;
+import java.util.List;
+import java.util.Random;
+import java.util.UUID;
+
+
+public class CustomerOrderFactory {
+
+<span class="fc" id="L12">    private static final Random RANDOM = new Random();</span>
+
+    private static final double MIN_PATIENCE_MULTIPLIER = 1.2;
+    private static final double MAX_PATIENCE_MULTIPLIER = 2.5;
+
+    private CustomerOrderFactory() {}
+
+    public static CustomerOrder createRandom(List&lt;Recipe&gt; availableRecipes) {
+<span class="pc bpc" id="L20" title="2 of 4 branches missed.">        if (availableRecipes == null || availableRecipes.isEmpty())</span>
+<span class="nc" id="L21">            throw new IllegalArgumentException(&quot;Recipe pool must not be empty.&quot;);</span>
+<span class="fc" id="L22">        Recipe chosen = availableRecipes.get(RANDOM.nextInt(availableRecipes.size()));</span>
+<span class="fc" id="L23">        return createForRecipe(chosen);</span>
+    }
+
+    public static CustomerOrder createForRecipe(Recipe recipe) {
+<span class="fc" id="L27">        double multiplier = MIN_PATIENCE_MULTIPLIER</span>
+<span class="fc" id="L28">                + RANDOM.nextDouble() * (MAX_PATIENCE_MULTIPLIER - MIN_PATIENCE_MULTIPLIER);</span>
+<span class="fc" id="L29">        int patienceSeconds = (int) (recipe.getPreparationTimeSeconds() * multiplier);</span>
+<span class="fc" id="L30">        String customerId = &quot;customer-&quot; + UUID.randomUUID().toString().substring(0, 8);</span>
+<span class="fc" id="L31">        return new CustomerOrder(customerId, recipe, patienceSeconds);</span>
+    }
+
+    public static CustomerOrder createImpatient(Recipe recipe) {
+<span class="nc" id="L35">        int patienceSeconds = (int) (recipe.getPreparationTimeSeconds() * MIN_PATIENCE_MULTIPLIER);</span>
+<span class="nc" id="L36">        String customerId = &quot;impatient-&quot; + UUID.randomUUID().toString().substring(0, 8);</span>
+<span class="nc" id="L37">        return new CustomerOrder(customerId, recipe, patienceSeconds);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

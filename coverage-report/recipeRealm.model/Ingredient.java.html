@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Ingredient.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JaCoCo Coverage Report</a> &gt; <a href="index.source.html" class="el_package">recipeRealm.model</a> &gt; <span class="el_source">Ingredient.java</span></div><h1>Ingredient.java</h1><pre class="source lang-java linenums">package recipeRealm.model;
+
+import java.time.LocalDate;
+
+public class Ingredient {
+
+    private final String id;
+    private final String name;
+    private final String unit;       
+    private double quantity;      
+    private final double requiredAmount;
+    private double costPerUnit;
+    private LocalDate expiryDate;  
+
+<span class="fc" id="L15">    public Ingredient(String id, String name, String unit, double quantity, double requiredAmount, double costPerUnit) {</span>
+<span class="fc" id="L16">        this.id = id;</span>
+<span class="fc" id="L17">        this.name = name;</span>
+<span class="fc" id="L18">        this.unit = unit;</span>
+<span class="fc" id="L19">        this.quantity = quantity;</span>
+<span class="fc" id="L20">        this.requiredAmount = requiredAmount;</span>
+<span class="fc" id="L21">        this.costPerUnit = costPerUnit;</span>
+<span class="fc" id="L22">    }</span>
+
+    public boolean isExpired() {
+<span class="fc bfc" id="L25" title="All 4 branches covered.">        return expiryDate != null &amp;&amp; LocalDate.now().isAfter(expiryDate);</span>
+    }
+
+    public boolean isAvailable() {
+<span class="pc bpc" id="L29" title="1 of 4 branches missed.">        return !isExpired() &amp;&amp; quantity &gt;= requiredAmount;</span>
+    }
+
+    public void consume() {
+<span class="pc bpc" id="L33" title="1 of 2 branches missed.">        if (!isAvailable()) throw new IllegalStateException(</span>
+                &quot;Cannot consume &quot; + name + &quot;: unavailable or insufficient stock.&quot;);
+<span class="fc" id="L35">        quantity -= requiredAmount;</span>
+<span class="fc" id="L36">    }</span>
+
+    public void restock(double amount) {
+<span class="nc bnc" id="L39" title="All 2 branches missed.">        if (amount &lt;= 0) throw new IllegalArgumentException(&quot;Restock amount must be positive.&quot;);</span>
+<span class="nc" id="L40">        this.quantity += amount;</span>
+<span class="nc" id="L41">    }</span>
+
+<span class="fc" id="L43">    public String getId()              { return id; }</span>
+<span class="fc" id="L44">    public String getName()            { return name; }</span>
+<span class="nc" id="L45">    public String getUnit()            { return unit; }</span>
+<span class="fc" id="L46">    public double getQuantity()        { return quantity; }</span>
+<span class="fc" id="L47">    public double getRequiredAmount()  { return requiredAmount; }</span>
+<span class="nc" id="L48">    public double getCostPerUnit()     { return costPerUnit; }</span>
+<span class="fc" id="L49">    public LocalDate getExpiryDate()   { return expiryDate; }</span>
+<span class="fc" id="L50">    public void setExpiryDate(LocalDate date) { this.expiryDate = date; }</span>
+<span class="nc" id="L51">    public void setCostPerUnit(double cost)   { this.costPerUnit = cost; }</span>
+
+    @Override
+    public String toString() {
+<span class="nc" id="L55">        return String.format(&quot;Ingredient[%s, qty=%.1f%s, req=%.1f, expired=%b]&quot;,</span>
+<span class="nc" id="L56">                name, quantity, unit, requiredAmount, isExpired());</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

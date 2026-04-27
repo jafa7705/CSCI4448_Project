@@ -2,10 +2,21 @@ Recipe Realm — Design Patterns, Architecture & Test Cases
 Project: Recipe Realm
 Team: Jason Fan, Alec Volkert
 Language: Java 
+Uses gradle as a build agent
+Compile usng gradle compileJava
+Run swing mod with gradle run
 
-Compile command: find . -name "*.java" > sources.txt && javac -d out @sources.txt
-Swing command: find . -name "*.java" > sources.txt && javac -d out @sources.txt && java -cp out recipeRealm.Main --swing
-Terminal command: find . -name "*.java" > sources.txt && javac -d out @sources.txt && java -cp out recipeRealm.Main --terminal
+Test coverage is in images/TestCoverage.png
+
+Run in terminal command java -cp out recipeRealm.TerminalGame
+
+Run in UI java -cp out recipeRealm.Main --swing
+
+Test coverage cmds
+rm -rf out && mkdir out && find ./main -name "*.java" > sources.txt && javac --release 21 -d out @sources.txt
+java -javaagent:jacoco/lib/jacocoagent.jar=destfile=jacoco.exec -cp out recipeRealm.test.RecipeRealmTestSuite
+java -jar jacoco/lib/jacococli.jar report jacoco.exec --classfiles out --sourcefiles ./main/java --html coverage-report
+open coverage-report/index.html
 
 
 # Design Patterns

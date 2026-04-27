@@ -3,6 +3,7 @@ package recipeRealm.observer;
 import recipeRealm.model.CookingResult;
 import recipeRealm.model.CustomerOrder;
 
+
 public class OrderFulfillmentObserver implements KitchenObserver {
 
     private  double totalEarnings = 0.0;
