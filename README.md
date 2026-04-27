@@ -4,7 +4,8 @@ Team: Jason Fan, Alec Volkert
 Language: Java 
 Uses gradle as a build agent
 Compile usng gradle compileJava
-Run swing mod with gradle run
+Run swing mode with gradle run
+Run terminal mode with gradle run --args="--terminal"
 
 Test coverage is in images/TestCoverage.png
 
