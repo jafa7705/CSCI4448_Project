@@ -26,7 +26,7 @@ public class GrillingStrategy implements CookingStrategy {
     }
 
     private String buildFeedback(int score, boolean hasGrillMarks) {
-        if (hasGrillMarks && score >= 90) return "Masterful grill marks — restaurant quality!";
+        if (hasGrillMarks && score >= 90) return "Masterful grill marks";
         if (score >= 70) return "Well grilled with a nice char.";
         if (score >= 50) return "Cooked through, but the exterior lacks colour.";
         return "Burnt to charcoal on the outside, raw inside.";
