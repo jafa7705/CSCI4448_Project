@@ -157,4 +157,12 @@ public class GameManager {
     public void spendFunds(double amount) {
         fulfillmentObserver.spend(amount);
     }
+
+    public double getLastOrderEarnings(){
+        return fulfillmentObserver.getLastEarned();
+    }
+
+    public int getLastOrderSatisfaction(){
+        return satisfactionObserver.getLastSatisfactionScore();
+    }
 }

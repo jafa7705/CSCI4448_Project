@@ -73,7 +73,7 @@ public class TerminalGame {
 
     private void printStatus() {
         System.out.println(DIVIDER2);
-        System.out.printf("  Skill: %s  |  Earnings: $%.2f  |  Satisfaction: %d%%%n",
+        System.out.printf("  Skill: %s  |  Earnings: $%.2f  |  Average Satisfaction: %d%%%n",
                 skillBar(game.getPlayerSkillLevel()),
                 game.getTotalEarnings(),
                 game.getAverageSatisfaction());
@@ -209,13 +209,14 @@ public class TerminalGame {
         System.out.printf("  Stars:    %s%n", stars(result.getStarRating()));
         System.out.printf("  Time:     %ds%n", result.getTimeTakenSeconds());
         System.out.printf("  Result:   %s%n", result.isSuccess() ? "SUCCESS" : "FAILED");
+        System.out.printf("  Satisfaction:   %d / 100%n", game.getLastOrderSatisfaction());
         System.out.printf("  Feedback: %s%n", result.getFeedbackMessage());
 
         if (result.isSuccess()) {
-            double basePrice = order.getRequestedRecipe().getBasePrice();
-            double earned = basePrice * Math.max(0.2, result.getScore() / 100.0);
+            double earned = game.getLastOrderEarnings();
             System.out.printf("  Earned:   $%.2f%n", earned);
         }
+        
         System.out.println(DIVIDER);
     }
 

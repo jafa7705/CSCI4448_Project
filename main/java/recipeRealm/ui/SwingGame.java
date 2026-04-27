@@ -46,10 +46,11 @@ public class SwingGame {
     private final JLabel lblPrice       = makeLabel("", Font.PLAIN, 13);
     private final JLabel lblDescription = makeLabel("", Font.ITALIC, 13);
 
-    private final JLabel lblScore    = makeLabel("", Font.BOLD, 28);
-    private final JLabel lblStars    = makeLabel("", Font.PLAIN, 20);
-    private final JLabel lblFeedback = makeLabel("", Font.ITALIC, 13);
-    private final JLabel lblEarned   = makeLabel("", Font.PLAIN, 13);
+    private final JLabel lblScore        = makeLabel("", Font.BOLD, 28);
+    private final JLabel lblStars        = makeLabel("", Font.PLAIN, 20);
+    private final JLabel lblFeedback     = makeLabel("", Font.ITALIC, 13);
+    private final JLabel lblEarned       = makeLabel("", Font.PLAIN, 13);
+    private final JLabel lblSatisfaction = makeLabel("", Font.PLAIN, 13);
 
     private final JLabel[] scoreTiles = new JLabel[5];
 
@@ -170,6 +171,7 @@ public class SwingGame {
         resultCard.add(centred(lblStars));
         resultCard.add(centred(lblFeedback));
         resultCard.add(centred(lblEarned));
+        resultCard.add(centred(lblSatisfaction));
 
         centre.add(resultCard);
         return centre;
@@ -231,8 +233,9 @@ public class SwingGame {
 
         Recipe base = pendingOrder.getRequestedRecipe();
         Recipe finalRecipe = applyDecoration(base);
+        pendingOrder.setRequestedRecipe(finalRecipe);
 
-        CustomerOrder order = recipeRealm.factory.CustomerOrderFactory.createForRecipe(finalRecipe);
+        CustomerOrder order = pendingOrder;
         game.getOrderService().enqueueOrder(order);
 
         CookingResult result = game.processNextOrder();
@@ -280,7 +283,10 @@ public class SwingGame {
         lblFeedback.setText(result.getFeedbackMessage());
         lblFeedback.setForeground(GRAY_DARK);
 
-        double earned = order.getRequestedRecipe().getBasePrice() * Math.max(0.2, score / 100.0);
+        lblSatisfaction.setText("Customer satisfaction: " + game.getLastOrderSatisfaction() + " / 100");
+        lblSatisfaction.setForeground(GRAY_DARK);
+
+        double earned = game.getLastOrderEarnings();
         lblEarned.setText(result.isSuccess()
             ? String.format("Earned  $%.2f", earned)
             : "No earnings (failed)");
@@ -309,6 +315,7 @@ public class SwingGame {
         lblStars.setText("");
         lblFeedback.setText("");
         lblEarned.setText("");
+        lblSatisfaction.setText("");
         for (JLabel t : scoreTiles) {
             t.setText("");
             t.setBackground(BG);

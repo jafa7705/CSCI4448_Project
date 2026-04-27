@@ -10,7 +10,7 @@ public class CustomerOrder {
 
     private final String orderId;
     private final String customerId;
-    private final Recipe requestedRecipe;
+    private Recipe requestedRecipe;
     private final Instant createdAt;
     private final int patienceSeconds;   
     private Status status;
@@ -48,8 +48,11 @@ public class CustomerOrder {
     public String getCustomerId(){ 
         return customerId; 
     }
-    public Recipe getRequestedRecipe(){ 
-        return requestedRecipe; 
+    public Recipe getRequestedRecipe(){
+        return requestedRecipe;
+    }
+    public void setRequestedRecipe(Recipe recipe) {
+        this.requestedRecipe = recipe;
     }
     public Instant getCreatedAt(){ 
         return createdAt;
