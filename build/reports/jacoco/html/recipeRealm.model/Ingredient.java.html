@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Ingredient.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">CSCI4448_Project</a> &gt; <a href="index.source.html" class="el_package">recipeRealm.model</a> &gt; <span class="el_source">Ingredient.java</span></div><h1>Ingredient.java</h1><pre class="source lang-java linenums">package recipeRealm.model;
+
+import java.time.LocalDate;
+
+public class Ingredient {
+
+    private final String id;
+    private final String name;
+    private final String unit;       
+    private double quantity;      
+    private final double requiredAmount;
+    private double costPerUnit;
+    private LocalDate expiryDate;  
+
+<span class="fc" id="L15">    public Ingredient(String id, String name, String unit, double quantity, double requiredAmount, double costPerUnit) {</span>
+<span class="fc" id="L16">        this.id = id;</span>
+<span class="fc" id="L17">        this.name = name;</span>
+<span class="fc" id="L18">        this.unit = unit;</span>
+<span class="fc" id="L19">        this.quantity = quantity;</span>
+<span class="fc" id="L20">        this.requiredAmount = requiredAmount;</span>
+<span class="fc" id="L21">        this.costPerUnit = costPerUnit;</span>
+<span class="fc" id="L22">    }</span>
+
+    public boolean isExpired() {
+<span class="fc bfc" id="L25" title="All 4 branches covered.">        return expiryDate != null &amp;&amp; LocalDate.now().isAfter(expiryDate);</span>
+    }
+
+    public boolean isAvailable() {
+<span class="fc bfc" id="L29" title="All 4 branches covered.">        return !isExpired() &amp;&amp; quantity &gt;= requiredAmount;</span>
+    }
+
+    public void consume() {
+<span class="fc bfc" id="L33" title="All 2 branches covered.">        if (!isAvailable()) throw new IllegalStateException(</span>
+                &quot;Cannot consume &quot; + name + &quot;: unavailable or insufficient stock.&quot;);
+<span class="fc" id="L35">        quantity -= requiredAmount;</span>
+<span class="fc" id="L36">    }</span>
+
+    public void restock(double amount) {
+<span class="fc bfc" id="L39" title="All 2 branches covered.">        if (amount &lt;= 0) throw new IllegalArgumentException(&quot;Restock amount must be positive.&quot;);</span>
+<span class="fc" id="L40">        this.quantity += amount;</span>
+<span class="fc" id="L41">    }</span>
+
+    public String getId(){ 
+<span class="fc" id="L44">        return id; }</span>
+
+    public String getName(){ 
+<span class="fc" id="L47">        return name; </span>
+    }
+    public String getUnit(){
+<span class="nc" id="L50">         return unit; </span>
+        }
+    public double getQuantity(){ 
+<span class="fc" id="L53">        return quantity; </span>
+    }
+    public double getRequiredAmount() { 
+<span class="fc" id="L56">        return requiredAmount; </span>
+
+    }
+    public double getCostPerUnit(){
+<span class="fc" id="L60">         return costPerUnit; </span>
+        }
+
+    public LocalDate getExpiryDate(){
+<span class="fc" id="L64">         return expiryDate; </span>
+        }
+
+    public void setExpiryDate(LocalDate date) {
+<span class="fc" id="L68">         this.expiryDate = date; </span>
+<span class="fc" id="L69">        }</span>
+
+    public void setCostPerUnit(double cost) {
+<span class="fc" id="L72">         this.costPerUnit = cost; </span>
+<span class="fc" id="L73">        }</span>
+
+    @Override
+    public String toString() {
+<span class="fc" id="L77">        return String.format(&quot;Ingredient[%s, qty=%.1f%s, req=%.1f, expired=%b]&quot;,</span>
+<span class="fc" id="L78">                name, quantity, unit, requiredAmount, isExpired());</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

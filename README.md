@@ -1,11 +1,20 @@
 Recipe Realm — Design Patterns, Architecture & Test Cases
+
 Project: Recipe Realm
+
 Team: Jason Fan, Alec Volkert
+
 Language: Java 
+
 Uses gradle as a build agent
+
 Compile usng gradle compileJava
+
 Run swing mode with gradle run
+
 Run terminal mode with gradle run --args="--terminal"
+
+Run tests and generate test report with gradle run --args="--test" && gradle jacocoRunReport
 
 Test coverage is in images/TestCoverage.png
 

@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GameManager.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">CSCI4448_Project</a> &gt; <a href="index.source.html" class="el_package">recipeRealm</a> &gt; <span class="el_source">GameManager.java</span></div><h1>GameManager.java</h1><pre class="source lang-java linenums">package recipeRealm;
+
+import recipeRealm.factory.CustomerOrderFactory;
+import recipeRealm.factory.IngredientFactory;
+import recipeRealm.factory.RecipeFactory;
+import recipeRealm.model.CustomerOrder;
+import recipeRealm.model.CookingResult;
+import recipeRealm.model.Ingredient;
+import recipeRealm.model.Recipe;
+import recipeRealm.observer.KitchenEventPublisher;
+import recipeRealm.observer.OrderFulfillmentObserver;
+import recipeRealm.observer.SatisfactionObserver;
+import recipeRealm.observer.StockAlertObserver;
+import recipeRealm.repository.InMemoryRecipeRepository;
+import recipeRealm.repository.InventoryRepository;
+import recipeRealm.service.InventoryService;
+import recipeRealm.service.OrderService;
+import recipeRealm.service.RecipeService;
+
+import java.util.List;
+
+
+public class GameManager {
+
+    
+
+    private final RecipeService recipeService;
+    private final InventoryService inventoryService;
+    private final OrderService orderService;
+    private final OrderFulfillmentObserver fulfillmentObserver;
+    private final SatisfactionObserver satisfactionObserver;
+    private final StockAlertObserver stockObserver;
+    private int playerSkillLevel;
+
+
+<span class="fc" id="L36">    public GameManager(int startingSkillLevel) {</span>
+<span class="fc" id="L37">        this.playerSkillLevel = startingSkillLevel;</span>
+
+
+<span class="fc" id="L40">        InMemoryRecipeRepository recipeRepo = new InMemoryRecipeRepository();</span>
+<span class="fc" id="L41">        InventoryRepository inventoryRepo = new InventoryRepository();</span>
+
+
+<span class="fc" id="L44">        this.recipeService   = new RecipeService(recipeRepo);</span>
+<span class="fc" id="L45">        this.inventoryService = new InventoryService(inventoryRepo);</span>
+
+
+<span class="fc" id="L48">        KitchenEventPublisher publisher = new KitchenEventPublisher();</span>
+<span class="fc" id="L49">        this.fulfillmentObserver  = new OrderFulfillmentObserver();</span>
+<span class="fc" id="L50">        this.satisfactionObserver = new SatisfactionObserver();</span>
+<span class="fc" id="L51">        this.stockObserver = new StockAlertObserver();</span>
+<span class="fc" id="L52">        publisher.registerObserver(fulfillmentObserver);</span>
+<span class="fc" id="L53">        publisher.registerObserver(satisfactionObserver);</span>
+<span class="fc" id="L54">        inventoryRepo.addObserver(stockObserver);</span>
+
+
+<span class="fc" id="L57">        this.orderService = new OrderService(publisher, inventoryRepo);</span>
+<span class="fc" id="L58">    }</span>
+
+
+
+
+
+
+    public void seedDefaultData() {
+<span class="fc" id="L66">        seedIngredients();</span>
+<span class="fc" id="L67">        seedRecipes();</span>
+<span class="fc" id="L68">    }</span>
+
+    private void seedIngredients() {
+<span class="fc" id="L71">        List&lt;Ingredient&gt; starters = List.of(</span>
+<span class="fc" id="L72">            IngredientFactory.createDryGood(&quot;ing-flour&quot;,  &quot;Flour&quot;,  500, 100, 0.002),</span>
+<span class="fc" id="L73">            IngredientFactory.createDryGood(&quot;ing-sugar&quot;,  &quot;Sugar&quot;,  300,  50, 0.003),</span>
+<span class="fc" id="L74">            IngredientFactory.createDryGood(&quot;ing-salt&quot;,   &quot;Salt&quot;,   200,  10, 0.001),</span>
+<span class="fc" id="L75">            IngredientFactory.createProtein(&quot;ing-egg&quot;,    &quot;Egg&quot;,    &quot;pieces&quot;, 12, 2, 0.30, 14),</span>
+<span class="fc" id="L76">            IngredientFactory.createDairy(  &quot;ing-butter&quot;, &quot;Butter&quot;, &quot;g&quot;,  250, 50, 0.012, 21),</span>
+<span class="fc" id="L77">            IngredientFactory.createDairy(  &quot;ing-milk&quot;,   &quot;Milk&quot;,   &quot;ml&quot;, 1000, 200, 0.002, 7),</span>
+<span class="fc" id="L78">            IngredientFactory.createProduce(&quot;ing-tomato&quot;, &quot;Tomato&quot;, 10, 2, 0.50, 5),</span>
+<span class="fc" id="L79">            IngredientFactory.createProtein(&quot;ing-chicken&quot;,&quot;Chicken&quot;,&quot;g&quot;,  600, 150, 0.015, 3),</span>
+<span class="fc" id="L80">            IngredientFactory.createProduce(&quot;ing-lemon&quot;,  &quot;Lemon&quot;,  6, 1, 0.40, 10),</span>
+<span class="fc" id="L81">            IngredientFactory.createNonPerishable(&quot;ing-oil&quot;, &quot;Olive Oil&quot;, &quot;ml&quot;, 500, 30, 0.005)</span>
+        );
+<span class="fc" id="L83">        starters.forEach(inventoryService::addIngredient);</span>
+<span class="fc" id="L84">    }</span>
+
+    private void seedRecipes() {
+<span class="fc" id="L87">        List&lt;Ingredient&gt; eggFlour = List.of(</span>
+<span class="fc" id="L88">            IngredientFactory.createNonPerishable(&quot;ing-egg&quot;,   &quot;Egg&quot;,   &quot;pieces&quot;, 12, 2, 0.30),</span>
+<span class="fc" id="L89">            IngredientFactory.createNonPerishable(&quot;ing-flour&quot;, &quot;Flour&quot;, &quot;g&quot;,     500, 100, 0.002)</span>
+        );
+<span class="fc" id="L91">        List&lt;Ingredient&gt; chickenLemon = List.of(</span>
+<span class="fc" id="L92">            IngredientFactory.createNonPerishable(&quot;ing-chicken&quot;, &quot;Chicken&quot;, &quot;g&quot;, 600, 150, 0.015),</span>
+<span class="fc" id="L93">            IngredientFactory.createNonPerishable(&quot;ing-lemon&quot;,   &quot;Lemon&quot;,   &quot;pieces&quot;, 6, 1, 0.40)</span>
+        );
+<span class="fc" id="L95">        List&lt;Ingredient&gt; tomatoOil = List.of(</span>
+<span class="fc" id="L96">            IngredientFactory.createNonPerishable(&quot;ing-tomato&quot;, &quot;Tomato&quot;,    &quot;pieces&quot;, 10, 2, 0.50),</span>
+<span class="fc" id="L97">            IngredientFactory.createNonPerishable(&quot;ing-oil&quot;,    &quot;Olive Oil&quot;, &quot;ml&quot;,    500, 30, 0.005)</span>
+        );
+<span class="fc" id="L99">        List&lt;Ingredient&gt; butterSugar = List.of(</span>
+<span class="fc" id="L100">            IngredientFactory.createNonPerishable(&quot;ing-butter&quot;, &quot;Butter&quot;, &quot;g&quot;,   250,  50, 0.012),</span>
+<span class="fc" id="L101">            IngredientFactory.createNonPerishable(&quot;ing-sugar&quot;,  &quot;Sugar&quot;,  &quot;g&quot;,   300,  50, 0.003),</span>
+<span class="fc" id="L102">            IngredientFactory.createNonPerishable(&quot;ing-flour&quot;,  &quot;Flour&quot;,  &quot;g&quot;,   500, 100, 0.002)</span>
+        );
+
+<span class="fc" id="L105">        tryAdd(RecipeFactory.createAppetizer(&quot;Bruschetta&quot;,      &quot;Grilled bread with tomato&quot;,        tomatoOil,    &quot;grilling&quot;, 1, 1));</span>
+<span class="fc" id="L106">        tryAdd(RecipeFactory.createAppetizer(&quot;Steamed Dumplings&quot;,&quot;Delicate pork parcels&quot;,           eggFlour,     &quot;steaming&quot;, 3, 2));</span>
+<span class="fc" id="L107">        tryAdd(RecipeFactory.createMainCourse(&quot;Lemon Chicken&quot;,  &quot;Zesty pan-seared chicken&quot;,         chickenLemon, &quot;frying&quot;,   4, 3));</span>
+<span class="fc" id="L108">        tryAdd(RecipeFactory.createMainCourse(&quot;Grilled Ribeye&quot;, &quot;Prime cut with herb butter&quot;,       chickenLemon, &quot;grilling&quot;, 6, 4));</span>
+<span class="fc" id="L109">        tryAdd(RecipeFactory.createMainCourse(&quot;Steamed Sea Bass&quot;,&quot;Delicately flavoured whole fish&quot;, chickenLemon, &quot;steaming&quot;, 5, 3));</span>
+<span class="fc" id="L110">        tryAdd(RecipeFactory.createDessert(&quot;Butter Cookies&quot;,    &quot;Classic melt-in-mouth shortbread&quot;, butterSugar,  &quot;baking&quot;,   2, 2));</span>
+<span class="fc" id="L111">        tryAdd(RecipeFactory.createDessert(&quot;Croissant&quot;,         &quot;Laminated buttery pastry&quot;,         butterSugar,  &quot;baking&quot;,   7, 5));</span>
+<span class="fc" id="L112">    }</span>
+
+    private void tryAdd(Recipe recipe) {
+<span class="fc" id="L115">        try { recipeService.addRecipe(recipe); }</span>
+<span class="pc" id="L116">        catch (IllegalArgumentException ignored) {}</span>
+<span class="fc" id="L117">    }</span>
+
+
+    
+    public CustomerOrder submitRandomOrder() {
+<span class="fc" id="L122">        List&lt;Recipe&gt; available = recipeService.getAvailableRecipes(playerSkillLevel);</span>
+<span class="pc bpc" id="L123" title="1 of 2 branches missed.">        if (available.isEmpty()) throw new IllegalStateException(&quot;No recipes available for skill level &quot; + playerSkillLevel);</span>
+<span class="fc" id="L124">        CustomerOrder order = CustomerOrderFactory.createRandom(available);</span>
+<span class="fc" id="L125">        orderService.enqueueOrder(order);</span>
+<span class="fc" id="L126">        System.out.printf(&quot;[Queue] Order added for '%s'. Queue size: %d%n&quot;,</span>
+<span class="fc" id="L127">                order.getRequestedRecipe().getName(), orderService.getQueueSize());</span>
+<span class="fc" id="L128">        return order;</span>
+    }
+
+
+    public CookingResult processNextOrder() {
+<span class="fc" id="L133">        return orderService.processNextOrder(playerSkillLevel);</span>
+    }
+
+
+    public void levelUp() {
+<span class="fc bfc" id="L138" title="All 2 branches covered.">        if (playerSkillLevel &lt; 10) {</span>
+<span class="fc" id="L139">            playerSkillLevel++;</span>
+<span class="fc" id="L140">            System.out.println(&quot;[Progress] Skill level increased to &quot; + playerSkillLevel);</span>
+        }
+<span class="fc" id="L142">    }</span>
+
+
+<span class="fc" id="L145">    public int getPlayerSkillLevel()     { return playerSkillLevel; }</span>
+<span class="fc" id="L146">    public double getTotalEarnings()     { return fulfillmentObserver.getTotalEarnings(); }</span>
+<span class="fc" id="L147">    public int getAverageSatisfaction()  { return satisfactionObserver.getAverageSatisfaction(); }</span>
+<span class="fc" id="L148">    public int getOrderQueueSize()       { return orderService.getQueueSize(); }</span>
+<span class="fc" id="L149">    public List&lt;Recipe&gt; getAllRecipes()  { return recipeService.getAllRecipes(); }</span>
+    public StockAlertObserver getStockObserver(){
+<span class="nc" id="L151">        return stockObserver;</span>
+    }
+
+<span class="nc" id="L154">    public RecipeService getRecipeService()       { return recipeService; }</span>
+<span class="nc" id="L155">    public InventoryService getInventoryService() { return inventoryService; }</span>
+<span class="nc" id="L156">    public OrderService getOrderService()         { return orderService; }</span>
+    public void spendFunds(double amount) {
+<span class="fc" id="L158">        fulfillmentObserver.spend(amount);</span>
+<span class="fc" id="L159">    }</span>
+
+    public double getLastOrderEarnings(){
+<span class="nc" id="L162">        return fulfillmentObserver.getLastEarned();</span>
+    }
+
+    public int getLastOrderSatisfaction(){
+<span class="nc" id="L166">        return satisfactionObserver.getLastSatisfactionScore();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

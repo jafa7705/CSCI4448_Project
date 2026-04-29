@@ -1,0 +1,463 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SwingGame.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">CSCI4448_Project</a> &gt; <a href="index.source.html" class="el_package">recipeRealm.ui</a> &gt; <span class="el_source">SwingGame.java</span></div><h1>SwingGame.java</h1><pre class="source lang-java linenums">package recipeRealm.ui;
+
+import recipeRealm.GameManager;
+import recipeRealm.decorator.*;
+import recipeRealm.factory.CustomerOrderFactory;
+import recipeRealm.model.*;
+
+import javax.swing.*;
+import javax.swing.border.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.List;
+
+
+public class SwingGame {
+
+
+<span class="nc" id="L18">    static final Color BG             = new Color(245, 245, 240);</span>
+<span class="nc" id="L19">    static final Color PANEL_BG       = Color.WHITE;</span>
+<span class="nc" id="L20">    static final Color BORDER_LIGHT   = new Color(210, 210, 210);</span>
+<span class="nc" id="L21">    static final Color BORDER_MED     = new Color(160, 160, 160);</span>
+<span class="nc" id="L22">    static final Color GREEN          = new Color(106, 170, 100);</span>
+<span class="nc" id="L23">    static final Color AMBER          = new Color(201, 180, 88);</span>
+<span class="nc" id="L24">    static final Color BLUE           = new Color(100, 149, 210);</span>
+<span class="nc" id="L25">    static final Color GRAY_DARK      = new Color(120, 124, 126);</span>
+<span class="nc" id="L26">    static final Color TEXT_ON_COLOR  = new Color(245, 245, 245);</span>
+<span class="nc" id="L27">    static final Color ACCENT         = new Color(80, 80, 80);</span>
+
+
+<span class="nc" id="L30">    private final GameManager game = new GameManager(1);</span>
+<span class="nc" id="L31">    private CustomerOrder pendingOrder = null;</span>
+<span class="nc" id="L32">    private int ordersCompleted = 0;</span>
+<span class="nc" id="L33">    private static final int[] XP_THRESHOLDS = { 0, 3, 7, 12, 18, 25, 33, 42, 52, 63 };</span>
+
+<span class="nc" id="L35">    private final JFrame frame = new JFrame(&quot;Recipe Realm&quot;);</span>
+
+<span class="nc" id="L37">    private final JLabel lblSkill    = makeLabel(&quot;Skill: Lv.1&quot;, Font.BOLD, 13);</span>
+<span class="nc" id="L38">    private final JLabel lblEarnings = makeLabel(&quot;$0.00&quot;, Font.PLAIN, 13);</span>
+<span class="nc" id="L39">    private final JLabel lblSat      = makeLabel(&quot;Satisfaction: —&quot;, Font.PLAIN, 13);</span>
+<span class="nc" id="L40">    private final JLabel lblXp       = makeLabel(&quot;XP: 0 / 3&quot;, Font.PLAIN, 13);</span>
+
+<span class="nc" id="L42">    private final JLabel lblOrderTitle  = makeLabel(&quot;Welcome to Recipe Realm!&quot;, Font.BOLD, 18);</span>
+<span class="nc" id="L43">    private final JLabel lblRecipeName  = makeLabel(&quot;&quot;, Font.BOLD, 15);</span>
+<span class="nc" id="L44">    private final JLabel lblMethod      = makeLabel(&quot;&quot;, Font.PLAIN, 13);</span>
+<span class="nc" id="L45">    private final JLabel lblSkillReq    = makeLabel(&quot;&quot;, Font.PLAIN, 13);</span>
+<span class="nc" id="L46">    private final JLabel lblPrice       = makeLabel(&quot;&quot;, Font.PLAIN, 13);</span>
+<span class="nc" id="L47">    private final JLabel lblDescription = makeLabel(&quot;&quot;, Font.ITALIC, 13);</span>
+
+<span class="nc" id="L49">    private final JLabel lblScore        = makeLabel(&quot;&quot;, Font.BOLD, 28);</span>
+<span class="nc" id="L50">    private final JLabel lblStars        = makeLabel(&quot;&quot;, Font.PLAIN, 20);</span>
+<span class="nc" id="L51">    private final JLabel lblFeedback     = makeLabel(&quot;&quot;, Font.ITALIC, 13);</span>
+<span class="nc" id="L52">    private final JLabel lblEarned       = makeLabel(&quot;&quot;, Font.PLAIN, 13);</span>
+<span class="nc" id="L53">    private final JLabel lblSatisfaction = makeLabel(&quot;&quot;, Font.PLAIN, 13);</span>
+
+<span class="nc" id="L55">    private final JLabel[] scoreTiles = new JLabel[5];</span>
+
+<span class="nc" id="L57">    private final JButton btnNewOrder = makeButton(&quot;New Order&quot;);</span>
+<span class="nc" id="L58">    private final JButton btnCook     = makeButton(&quot;Cook!&quot;);</span>
+<span class="nc" id="L59">    private final JButton btnSkip     = makeButton(&quot;Skip&quot;);</span>
+<span class="nc" id="L60">    private final JButton btnRecipes  = makeButton(&quot;Recipe Book&quot;);</span>
+
+<span class="nc" id="L62">    private final JToggleButton[] decoButtons = {</span>
+<span class="nc" id="L63">        makeToggle(&quot;Extra Spicy  +$2&quot;),</span>
+<span class="nc" id="L64">        makeToggle(&quot;Premium  ×1.5&quot;),</span>
+<span class="nc" id="L65">        makeToggle(&quot;Double  ×2&quot;),</span>
+<span class="nc" id="L66">        makeToggle(&quot;Gluten-Free  +$3&quot;),</span>
+    };
+
+
+<span class="nc" id="L70">    private final JLabel lblMessage = makeLabel(&quot;Press 'New Order' to start!&quot;, Font.PLAIN, 13);</span>
+
+
+<span class="nc" id="L73">    public SwingGame() {</span>
+<span class="nc" id="L74">        game.seedDefaultData();</span>
+<span class="nc" id="L75">        buildUi();</span>
+<span class="nc" id="L76">        updateStatusBar();</span>
+<span class="nc" id="L77">    }</span>
+
+    private void buildUi() {
+<span class="nc" id="L80">        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);</span>
+<span class="nc" id="L81">        frame.setBackground(BG);</span>
+<span class="nc" id="L82">        frame.setLayout(new BorderLayout(0, 0));</span>
+
+<span class="nc" id="L84">        frame.add(buildStatusBar(), BorderLayout.NORTH);</span>
+<span class="nc" id="L85">        frame.add(buildCentrePanel(), BorderLayout.CENTER);</span>
+<span class="nc" id="L86">        frame.add(buildBottomBar(), BorderLayout.SOUTH);</span>
+
+<span class="nc" id="L88">        frame.pack();</span>
+<span class="nc" id="L89">        frame.setMinimumSize(new Dimension(520, 560));</span>
+<span class="nc" id="L90">        frame.setLocationRelativeTo(null);</span>
+<span class="nc" id="L91">    }</span>
+
+    private JPanel buildStatusBar() {
+<span class="nc" id="L94">        JPanel bar = new JPanel(new FlowLayout(FlowLayout.LEFT, 16, 8));</span>
+<span class="nc" id="L95">        bar.setBackground(ACCENT);</span>
+<span class="nc" id="L96">        JLabel title = makeLabel(&quot;Recipe Realm&quot;, Font.BOLD, 14);</span>
+<span class="nc" id="L97">        title.setForeground(Color.WHITE);</span>
+<span class="nc" id="L98">        bar.add(title);</span>
+
+<span class="nc bnc" id="L100" title="All 2 branches missed.">        for (JLabel l : new JLabel[]{ lblSkill, lblEarnings, lblSat, lblXp }) {</span>
+<span class="nc" id="L101">            l.setForeground(new Color(220, 220, 220));</span>
+<span class="nc" id="L102">            bar.add(makeSeparator());</span>
+<span class="nc" id="L103">            bar.add(l);</span>
+        }
+<span class="nc" id="L105">        return bar;</span>
+    }
+
+    private JLabel makeSeparator() {
+<span class="nc" id="L109">        JLabel sep = new JLabel(&quot;|&quot;);</span>
+<span class="nc" id="L110">        sep.setForeground(new Color(120, 120, 120));</span>
+<span class="nc" id="L111">        return sep;</span>
+    }
+
+    private JPanel buildCentrePanel() {
+<span class="nc" id="L115">        JPanel centre = new JPanel();</span>
+<span class="nc" id="L116">        centre.setBackground(BG);</span>
+<span class="nc" id="L117">        centre.setLayout(new BoxLayout(centre, BoxLayout.Y_AXIS));</span>
+<span class="nc" id="L118">        centre.setBorder(BorderFactory.createEmptyBorder(16, 24, 8, 24));</span>
+
+<span class="nc" id="L120">        JPanel orderCard = buildCard();</span>
+<span class="nc" id="L121">        orderCard.setLayout(new BoxLayout(orderCard, BoxLayout.Y_AXIS));</span>
+<span class="nc" id="L122">        orderCard.add(centred(lblOrderTitle));</span>
+<span class="nc" id="L123">        orderCard.add(Box.createVerticalStrut(8));</span>
+<span class="nc" id="L124">        orderCard.add(centred(lblRecipeName));</span>
+<span class="nc" id="L125">        orderCard.add(centred(lblDescription));</span>
+<span class="nc" id="L126">        orderCard.add(Box.createVerticalStrut(4));</span>
+
+<span class="nc" id="L128">        JPanel details = new JPanel(new GridLayout(2, 2, 8, 2));</span>
+<span class="nc" id="L129">        details.setOpaque(false);</span>
+<span class="nc" id="L130">        details.add(lblMethod);</span>
+<span class="nc" id="L131">        details.add(lblSkillReq);</span>
+<span class="nc" id="L132">        details.add(lblPrice);</span>
+<span class="nc" id="L133">        details.add(new JLabel());</span>
+<span class="nc" id="L134">        orderCard.add(details);</span>
+
+<span class="nc" id="L136">        orderCard.add(Box.createVerticalStrut(10));</span>
+<span class="nc" id="L137">        JPanel decoRow = new JPanel(new FlowLayout(FlowLayout.CENTER, 6, 0));</span>
+<span class="nc" id="L138">        decoRow.setOpaque(false);</span>
+<span class="nc bnc" id="L139" title="All 2 branches missed.">        for (JToggleButton b : decoButtons) decoRow.add(b);</span>
+<span class="nc" id="L140">        orderCard.add(decoRow);</span>
+
+<span class="nc" id="L142">        orderCard.add(Box.createVerticalStrut(10));</span>
+<span class="nc" id="L143">        JPanel actionRow = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));</span>
+<span class="nc" id="L144">        actionRow.setOpaque(false);</span>
+<span class="nc" id="L145">        actionRow.add(btnNewOrder);</span>
+<span class="nc" id="L146">        actionRow.add(btnCook);</span>
+<span class="nc" id="L147">        actionRow.add(btnSkip);</span>
+<span class="nc" id="L148">        actionRow.add(btnRecipes);</span>
+<span class="nc" id="L149">        orderCard.add(actionRow);</span>
+
+<span class="nc" id="L151">        centre.add(orderCard);</span>
+<span class="nc" id="L152">        centre.add(Box.createVerticalStrut(12));</span>
+
+<span class="nc" id="L154">        JPanel resultCard = buildCard();</span>
+<span class="nc" id="L155">        resultCard.setLayout(new BoxLayout(resultCard, BoxLayout.Y_AXIS));</span>
+
+<span class="nc" id="L157">        JPanel tileRow = new JPanel(new FlowLayout(FlowLayout.CENTER, 6, 4));</span>
+<span class="nc" id="L158">        tileRow.setOpaque(false);</span>
+<span class="nc bnc" id="L159" title="All 2 branches missed.">        for (int i = 0; i &lt; scoreTiles.length; i++) {</span>
+<span class="nc" id="L160">            JLabel tile = new JLabel(&quot;&quot;, SwingConstants.CENTER);</span>
+<span class="nc" id="L161">            tile.setOpaque(true);</span>
+<span class="nc" id="L162">            tile.setPreferredSize(new Dimension(48, 48));</span>
+<span class="nc" id="L163">            tile.setBorder(new LineBorder(BORDER_LIGHT, 2));</span>
+<span class="nc" id="L164">            tile.setBackground(BG);</span>
+<span class="nc" id="L165">            tile.setFont(new Font(&quot;SansSerif&quot;, Font.BOLD, 18));</span>
+<span class="nc" id="L166">            scoreTiles[i] = tile;</span>
+<span class="nc" id="L167">            tileRow.add(tile);</span>
+        }
+<span class="nc" id="L169">        resultCard.add(tileRow);</span>
+<span class="nc" id="L170">        resultCard.add(centred(lblScore));</span>
+<span class="nc" id="L171">        resultCard.add(centred(lblStars));</span>
+<span class="nc" id="L172">        resultCard.add(centred(lblFeedback));</span>
+<span class="nc" id="L173">        resultCard.add(centred(lblEarned));</span>
+<span class="nc" id="L174">        resultCard.add(centred(lblSatisfaction));</span>
+
+<span class="nc" id="L176">        centre.add(resultCard);</span>
+<span class="nc" id="L177">        return centre;</span>
+    }
+
+    private JPanel buildCard() {
+<span class="nc" id="L181">        JPanel card = new JPanel();</span>
+<span class="nc" id="L182">        card.setBackground(PANEL_BG);</span>
+<span class="nc" id="L183">        card.setBorder(BorderFactory.createCompoundBorder(</span>
+            new LineBorder(BORDER_LIGHT, 1),
+<span class="nc" id="L185">            BorderFactory.createEmptyBorder(12, 16, 12, 16)</span>
+        ));
+<span class="nc" id="L187">        card.setAlignmentX(Component.LEFT_ALIGNMENT);</span>
+<span class="nc" id="L188">        return card;</span>
+    }
+
+
+    private JPanel buildBottomBar() {
+<span class="nc" id="L193">        JPanel bar = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 8));</span>
+<span class="nc" id="L194">        bar.setBackground(BG);</span>
+<span class="nc" id="L195">        bar.setBorder(new MatteBorder(1, 0, 0, 0, BORDER_LIGHT));</span>
+<span class="nc" id="L196">        bar.add(lblMessage);</span>
+<span class="nc" id="L197">        return bar;</span>
+    }
+
+    private void wireButtons() {
+<span class="nc" id="L201">        btnNewOrder.addActionListener(e -&gt; handleNewOrder());</span>
+<span class="nc" id="L202">        btnCook.addActionListener(e -&gt; handleCook());</span>
+<span class="nc" id="L203">        btnSkip.addActionListener(e -&gt; handleSkip());</span>
+<span class="nc" id="L204">        btnRecipes.addActionListener(e -&gt; showRecipeBook());</span>
+
+<span class="nc" id="L206">        setCookingButtonsEnabled(false);</span>
+<span class="nc" id="L207">    }</span>
+
+    private void handleNewOrder() {
+<span class="nc" id="L210">        List&lt;Recipe&gt; available = game.getRecipeService().getAvailableRecipes(game.getPlayerSkillLevel());</span>
+<span class="nc bnc" id="L211" title="All 2 branches missed.">        if (available.isEmpty()) {</span>
+<span class="nc" id="L212">            setMessage(&quot;No recipes available at your skill level yet.&quot;);</span>
+<span class="nc" id="L213">            return;</span>
+        }
+<span class="nc" id="L215">        pendingOrder = CustomerOrderFactory.createRandom(available);</span>
+<span class="nc" id="L216">        Recipe r = pendingOrder.getRequestedRecipe();</span>
+
+<span class="nc" id="L218">        lblOrderTitle.setText(&quot;Customer order incoming!&quot;);</span>
+<span class="nc" id="L219">        lblRecipeName.setText(r.getName() + &quot;  [&quot; + r.getCategory() + &quot;]&quot;);</span>
+<span class="nc" id="L220">        lblDescription.setText(r.getDescription());</span>
+<span class="nc" id="L221">        lblMethod.setText(&quot;Method: &quot; + r.getCookingStrategy().getMethodName());</span>
+<span class="nc" id="L222">        lblSkillReq.setText(&quot;Skill req: &quot; + r.getRequiredSkillLevel() + &quot;  /  Complexity: &quot; + r.getComplexity());</span>
+<span class="nc" id="L223">        lblPrice.setText(&quot;Base price: $&quot; + String.format(&quot;%.2f&quot;, r.getBasePrice()));</span>
+
+<span class="nc" id="L225">        clearResult();</span>
+<span class="nc bnc" id="L226" title="All 2 branches missed.">        for (JToggleButton b : decoButtons) b.setSelected(false);</span>
+<span class="nc" id="L227">        setCookingButtonsEnabled(true);</span>
+<span class="nc" id="L228">        setMessage(&quot;Pick a variation (optional) then hit Cook!&quot;);</span>
+<span class="nc" id="L229">    }</span>
+
+    private void handleCook() {
+<span class="nc bnc" id="L232" title="All 2 branches missed.">        if (pendingOrder == null) return;</span>
+
+<span class="nc" id="L234">        Recipe base = pendingOrder.getRequestedRecipe();</span>
+<span class="nc" id="L235">        Recipe finalRecipe = applyDecoration(base);</span>
+<span class="nc" id="L236">        pendingOrder.setRequestedRecipe(finalRecipe);</span>
+
+<span class="nc" id="L238">        CustomerOrder order = pendingOrder;</span>
+<span class="nc" id="L239">        game.getOrderService().enqueueOrder(order);</span>
+
+<span class="nc" id="L241">        CookingResult result = game.processNextOrder();</span>
+<span class="nc bnc" id="L242" title="All 2 branches missed.">        if (result == null) {</span>
+<span class="nc" id="L243">            setMessage(&quot;The order expired before cooking!&quot;);</span>
+<span class="nc" id="L244">            setCookingButtonsEnabled(false);</span>
+<span class="nc" id="L245">            pendingOrder = null;</span>
+<span class="nc" id="L246">            return;</span>
+        }
+
+<span class="nc" id="L249">        ordersCompleted++;</span>
+<span class="nc" id="L250">        showResult(result, order);</span>
+<span class="nc" id="L251">        checkLevelUp();</span>
+<span class="nc" id="L252">        updateStatusBar();</span>
+<span class="nc" id="L253">        handleStockAlerts();</span>
+<span class="nc" id="L254">        setCookingButtonsEnabled(false);</span>
+<span class="nc" id="L255">        pendingOrder = null;</span>
+<span class="nc" id="L256">    }</span>
+
+    private void handleSkip() {
+<span class="nc" id="L259">        pendingOrder = null;</span>
+<span class="nc" id="L260">        lblOrderTitle.setText(&quot;Order skipped.&quot;);</span>
+<span class="nc" id="L261">        lblRecipeName.setText(&quot;&quot;);</span>
+<span class="nc" id="L262">        lblDescription.setText(&quot;&quot;);</span>
+<span class="nc" id="L263">        lblMethod.setText(&quot;&quot;);</span>
+<span class="nc" id="L264">        lblSkillReq.setText(&quot;&quot;);</span>
+<span class="nc" id="L265">        lblPrice.setText(&quot;&quot;);</span>
+<span class="nc" id="L266">        clearResult();</span>
+<span class="nc bnc" id="L267" title="All 2 branches missed.">        for (JToggleButton b : decoButtons) b.setSelected(false);</span>
+<span class="nc" id="L268">        setCookingButtonsEnabled(false);</span>
+<span class="nc" id="L269">        setMessage(&quot;Skipped. Press 'New Order' for another customer.&quot;);</span>
+<span class="nc" id="L270">    }</span>
+
+
+    private void showResult(CookingResult result, CustomerOrder order) {
+<span class="nc" id="L274">        int score = result.getScore();</span>
+<span class="nc" id="L275">        int stars = result.getStarRating();</span>
+
+<span class="nc" id="L277">        lblScore.setText(score + &quot; / 100&quot;);</span>
+<span class="nc" id="L278">        lblScore.setForeground(scoreColor(score));</span>
+
+<span class="nc" id="L280">        lblStars.setText(&quot;★&quot;.repeat(stars) + &quot;☆&quot;.repeat(5 - stars));</span>
+<span class="nc" id="L281">        lblStars.setForeground(AMBER);</span>
+
+<span class="nc" id="L283">        lblFeedback.setText(result.getFeedbackMessage());</span>
+<span class="nc" id="L284">        lblFeedback.setForeground(GRAY_DARK);</span>
+
+<span class="nc" id="L286">        lblSatisfaction.setText(&quot;Customer satisfaction: &quot; + game.getLastOrderSatisfaction() + &quot; / 100&quot;);</span>
+<span class="nc" id="L287">        lblSatisfaction.setForeground(GRAY_DARK);</span>
+
+<span class="nc" id="L289">        double earned = game.getLastOrderEarnings();</span>
+<span class="nc bnc" id="L290" title="All 2 branches missed.">        lblEarned.setText(result.isSuccess()</span>
+<span class="nc" id="L291">            ? String.format(&quot;Earned  $%.2f&quot;, earned)</span>
+<span class="nc" id="L292">            : &quot;No earnings (failed)&quot;);</span>
+<span class="nc bnc" id="L293" title="All 2 branches missed.">        lblEarned.setForeground(result.isSuccess() ? GREEN : GRAY_DARK);</span>
+
+<span class="nc bnc" id="L295" title="All 2 branches missed.">        for (int i = 0; i &lt; scoreTiles.length; i++) {</span>
+<span class="nc" id="L296">            int threshold = (i + 1) * 20;</span>
+<span class="nc bnc" id="L297" title="All 2 branches missed.">            if (score &gt;= threshold) {</span>
+<span class="nc" id="L298">                scoreTiles[i].setBackground(tileColor(i, score));</span>
+<span class="nc" id="L299">                scoreTiles[i].setForeground(TEXT_ON_COLOR);</span>
+<span class="nc" id="L300">                scoreTiles[i].setText(String.valueOf((i + 1) * 20));</span>
+<span class="nc" id="L301">                scoreTiles[i].setBorder(new LineBorder(BORDER_MED, 2));</span>
+            } else {
+<span class="nc" id="L303">                scoreTiles[i].setBackground(BG);</span>
+<span class="nc" id="L304">                scoreTiles[i].setForeground(GRAY_DARK);</span>
+<span class="nc" id="L305">                scoreTiles[i].setText(&quot;&quot;);</span>
+<span class="nc" id="L306">                scoreTiles[i].setBorder(new LineBorder(BORDER_LIGHT, 2));</span>
+            }
+        }
+
+<span class="nc bnc" id="L310" title="All 2 branches missed.">        setMessage(result.isSuccess() ? &quot;Great cook! Press 'New Order' to continue.&quot; : &quot;Dish failed. Try again!&quot;);</span>
+<span class="nc" id="L311">    }</span>
+
+    private void clearResult() {
+<span class="nc" id="L314">        lblScore.setText(&quot;&quot;);</span>
+<span class="nc" id="L315">        lblStars.setText(&quot;&quot;);</span>
+<span class="nc" id="L316">        lblFeedback.setText(&quot;&quot;);</span>
+<span class="nc" id="L317">        lblEarned.setText(&quot;&quot;);</span>
+<span class="nc" id="L318">        lblSatisfaction.setText(&quot;&quot;);</span>
+<span class="nc bnc" id="L319" title="All 2 branches missed.">        for (JLabel t : scoreTiles) {</span>
+<span class="nc" id="L320">            t.setText(&quot;&quot;);</span>
+<span class="nc" id="L321">            t.setBackground(BG);</span>
+<span class="nc" id="L322">            t.setBorder(new LineBorder(BORDER_LIGHT, 2));</span>
+        }
+<span class="nc" id="L324">    }</span>
+
+    private Color scoreColor(int score) {
+<span class="nc bnc" id="L327" title="All 2 branches missed.">        if (score &gt;= 90) return GREEN;</span>
+<span class="nc bnc" id="L328" title="All 2 branches missed.">        if (score &gt;= 60) return AMBER;</span>
+<span class="nc" id="L329">        return new Color(180, 80, 80);</span>
+    }
+
+    private Color tileColor(int index, int score) {
+<span class="nc bnc" id="L333" title="All 2 branches missed.">        if (score &gt;= 90) return GREEN;</span>
+<span class="nc bnc" id="L334" title="All 2 branches missed.">        if (score &gt;= 60) return AMBER;</span>
+<span class="nc bnc" id="L335" title="All 2 branches missed.">        if (score &gt;= 40) return BLUE;</span>
+<span class="nc" id="L336">        return GRAY_DARK;</span>
+    }
+
+    private void showRecipeBook() {
+<span class="nc" id="L340">        List&lt;Recipe&gt; all = game.getAllRecipes();</span>
+<span class="nc" id="L341">        int skill = game.getPlayerSkillLevel();</span>
+
+<span class="nc" id="L343">        String[] cols = { &quot;Recipe&quot;, &quot;Category&quot;, &quot;Method&quot;, &quot;Skill&quot;, &quot;Price&quot; };</span>
+<span class="nc" id="L344">        Object[][] data = all.stream().map(r -&gt; new Object[]{</span>
+<span class="nc bnc" id="L345" title="All 2 branches missed.">            (r.getRequiredSkillLevel() &gt; skill ? &quot;[locked] &quot; : &quot;&quot;) + r.getName(),</span>
+<span class="nc" id="L346">            r.getCategory(),</span>
+<span class="nc" id="L347">            r.getCookingStrategy().getMethodName(),</span>
+<span class="nc" id="L348">            r.getRequiredSkillLevel(),</span>
+<span class="nc" id="L349">            String.format(&quot;$%.2f&quot;, r.getBasePrice())</span>
+<span class="nc" id="L350">        }).toArray(Object[][]::new);</span>
+
+<span class="nc" id="L352">        JTable table = new JTable(data, cols);</span>
+<span class="nc" id="L353">        table.setFont(new Font(&quot;SansSerif&quot;, Font.PLAIN, 13));</span>
+<span class="nc" id="L354">        table.setRowHeight(24);</span>
+<span class="nc" id="L355">        table.setEnabled(false);</span>
+<span class="nc" id="L356">        table.getTableHeader().setFont(new Font(&quot;SansSerif&quot;, Font.BOLD, 13));</span>
+
+<span class="nc" id="L358">        JScrollPane scroll = new JScrollPane(table);</span>
+<span class="nc" id="L359">        scroll.setPreferredSize(new Dimension(500, 220));</span>
+
+<span class="nc" id="L361">        JOptionPane.showMessageDialog(frame, scroll, &quot;Recipe Book&quot;, JOptionPane.PLAIN_MESSAGE);</span>
+<span class="nc" id="L362">    }</span>
+
+
+    private Recipe applyDecoration(Recipe base) {
+<span class="nc" id="L366">        Recipe r = base;</span>
+<span class="nc bnc" id="L367" title="All 2 branches missed.">        if (decoButtons[0].isSelected()) r = new ExtraSpicyDecorator(r);</span>
+<span class="nc bnc" id="L368" title="All 2 branches missed.">        if (decoButtons[1].isSelected()) r = new PremiumDecorator(r);</span>
+<span class="nc bnc" id="L369" title="All 2 branches missed.">        if (decoButtons[2].isSelected()) r = new DoubleServingDecorator(r);</span>
+<span class="nc bnc" id="L370" title="All 2 branches missed.">        if (decoButtons[3].isSelected()) r = new GlutenFreeDecorator(r);</span>
+<span class="nc" id="L371">        return r;</span>
+    }
+
+
+    private void checkLevelUp() {
+<span class="nc" id="L376">        int current = game.getPlayerSkillLevel();</span>
+<span class="nc bnc" id="L377" title="All 2 branches missed.">        if (current &gt;= 10) return;</span>
+<span class="nc bnc" id="L378" title="All 2 branches missed.">        if (ordersCompleted &gt;= XP_THRESHOLDS[current]) {</span>
+<span class="nc" id="L379">            game.levelUp();</span>
+<span class="nc" id="L380">            setMessage(&quot;★ LEVEL UP! You are now a skill-&quot; + game.getPlayerSkillLevel() + &quot; chef!&quot;);</span>
+        }
+<span class="nc" id="L382">    }</span>
+
+    private void updateStatusBar() {
+<span class="nc" id="L385">        int skill = game.getPlayerSkillLevel();</span>
+<span class="nc" id="L386">        lblSkill.setText(&quot;Skill: Lv.&quot; + skill);</span>
+<span class="nc" id="L387">        lblEarnings.setText(&quot;Earned: $&quot; + String.format(&quot;%.2f&quot;, game.getTotalEarnings()));</span>
+<span class="nc" id="L388">        lblSat.setText(&quot;Satisfaction: &quot; + game.getAverageSatisfaction() + &quot;%&quot;);</span>
+<span class="nc bnc" id="L389" title="All 2 branches missed.">        int next = skill &lt; 10 ? XP_THRESHOLDS[skill] : -1;</span>
+<span class="nc bnc" id="L390" title="All 2 branches missed.">        lblXp.setText(next &gt; 0 ? &quot;XP: &quot; + ordersCompleted + &quot;/&quot; + next : &quot;MAX LEVEL&quot;);</span>
+<span class="nc" id="L391">    }</span>
+
+
+    private void setCookingButtonsEnabled(boolean enabled) {
+<span class="nc" id="L395">        btnCook.setEnabled(enabled);</span>
+<span class="nc" id="L396">        btnSkip.setEnabled(enabled);</span>
+<span class="nc bnc" id="L397" title="All 2 branches missed.">        for (JToggleButton b : decoButtons) b.setEnabled(enabled);</span>
+<span class="nc" id="L398">    }</span>
+
+    private void setMessage(String text) {
+<span class="nc" id="L401">        lblMessage.setText(text);</span>
+<span class="nc" id="L402">    }</span>
+
+    private static JLabel makeLabel(String text, int style, int size) {
+<span class="nc" id="L405">        JLabel l = new JLabel(text);</span>
+<span class="nc" id="L406">        l.setFont(new Font(&quot;SansSerif&quot;, style, size));</span>
+<span class="nc" id="L407">        return l;</span>
+    }
+
+    private static JButton makeButton(String text) {
+<span class="nc" id="L411">        JButton b = new JButton(text);</span>
+<span class="nc" id="L412">        b.setFont(new Font(&quot;SansSerif&quot;, Font.PLAIN, 13));</span>
+<span class="nc" id="L413">        b.setFocusPainted(false);</span>
+<span class="nc" id="L414">        return b;</span>
+    }
+
+    private static JToggleButton makeToggle(String text) {
+<span class="nc" id="L418">        JToggleButton b = new JToggleButton(text);</span>
+<span class="nc" id="L419">        b.setFont(new Font(&quot;SansSerif&quot;, Font.PLAIN, 12));</span>
+<span class="nc" id="L420">        b.setFocusPainted(false);</span>
+<span class="nc" id="L421">        return b;</span>
+    }
+
+    private static JPanel centred(JLabel label) {
+<span class="nc" id="L425">        JPanel p = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 2));</span>
+<span class="nc" id="L426">        p.setOpaque(false);</span>
+<span class="nc" id="L427">        p.add(label);</span>
+<span class="nc" id="L428">        return p;</span>
+    }
+
+    public void show() {
+<span class="nc" id="L432">        wireButtons();</span>
+<span class="nc" id="L433">        SwingUtilities.invokeLater(() -&gt; frame.setVisible(true));</span>
+<span class="nc" id="L434">    }</span>
+
+    private void handleStockAlerts() {
+<span class="nc bnc" id="L437" title="All 2 branches missed.">        for (Ingredient ingredient : game.getStockObserver().getAlerts()) {</span>
+<span class="nc" id="L438">            int choice = JOptionPane.showOptionDialog(frame,</span>
+<span class="nc" id="L439">                ingredient.getName() + &quot; is Low/Expired.&quot;,</span>
+                &quot;Stock Alert&quot;,
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE,
+                null,
+                new String[]{ &quot;Buy More&quot;, &quot;Remove Recipes&quot; },
+                &quot;Buy More&quot;);
+<span class="nc bnc" id="L446" title="All 2 branches missed.">            if (choice == 0) {</span>
+<span class="nc" id="L447">                double restockAmount = ingredient.getRequiredAmount() * 10;</span>
+<span class="nc" id="L448">                double cost = restockAmount * ingredient.getCostPerUnit();</span>
+<span class="nc" id="L449">                game.spendFunds(cost);</span>
+<span class="nc" id="L450">                game.getInventoryService().restockIngredient(ingredient.getId(), restockAmount);</span>
+<span class="nc" id="L451">            } else {</span>
+<span class="nc" id="L452">                game.getRecipeService().removeRecipeWithIngredient(ingredient);</span>
+            }
+<span class="nc" id="L454">        }</span>
+<span class="nc" id="L455">        game.getStockObserver().clearAlerts();</span>
+<span class="nc" id="L456">        updateStatusBar();</span>
+<span class="nc" id="L457">    }</span>
+
+    public static void main(String[] args) {
+<span class="nc" id="L460">        new SwingGame().show();</span>
+<span class="nc" id="L461">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

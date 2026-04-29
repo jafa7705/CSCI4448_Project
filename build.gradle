@@ -1,6 +1,11 @@
 plugins {
     id 'java'
     id 'application'
+    id 'jacoco'
+}
+
+repositories {
+    mavenCentral()
 }
 
 application {
@@ -15,6 +20,29 @@ sourceSets {
     }
 }
 
+configurations {
+    jacocoRuntime
+}
+
+dependencies {
+    jacocoRuntime "org.jacoco:org.jacoco.agent:0.8.14:runtime"
+}
+
+jacoco {
+    toolVersion = "0.8.14"
+}
+
 run {
     standardInput = System.in
+    jvmArgs "-javaagent:${configurations.jacocoRuntime.asPath}=destfile=${buildDir}/jacoco/run.exec,append=false"
+}
+
+task jacocoRunReport(type: JacocoReport) {
+    executionData fileTree(buildDir).include("/jacoco/*.exec")
+    sourceSets sourceSets.main
+    reports {
+        html.required = true
+        html.outputLocation = layout.buildDirectory.dir('reports/jacoco/html')
+        xml.required = false
+    }
 }

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BaseRecipe.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">CSCI4448_Project</a> &gt; <a href="index.source.html" class="el_package">recipeRealm.model</a> &gt; <span class="el_source">BaseRecipe.java</span></div><h1>BaseRecipe.java</h1><pre class="source lang-java linenums">package recipeRealm.model;
+
+import recipeRealm.cooking.CookingStrategy;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+
+public abstract class BaseRecipe implements Recipe {
+
+    private final String id;
+    private final String name;
+    private final String description;
+    private final List&lt;Ingredient&gt; ingredients;
+    private final CookingStrategy cookingStrategy;
+    private final int requiredSkillLevel;
+    private final int complexity;
+    private final int preparationTimeSeconds;
+
+    protected BaseRecipe(String name, String description, List&lt;Ingredient&gt; ingredients, CookingStrategy cookingStrategy, int requiredSkillLevel, int complexity,
+<span class="fc" id="L21">        int preparationTimeSeconds) {</span>
+<span class="fc" id="L22">        this.id = UUID.randomUUID().toString();</span>
+<span class="fc" id="L23">        this.name = name;</span>
+<span class="fc" id="L24">        this.description = description;</span>
+<span class="fc" id="L25">        this.ingredients = new ArrayList&lt;&gt;(ingredients);</span>
+<span class="fc" id="L26">        this.cookingStrategy = cookingStrategy;</span>
+<span class="fc" id="L27">        this.requiredSkillLevel = requiredSkillLevel;</span>
+<span class="fc" id="L28">        this.complexity = complexity;</span>
+<span class="fc" id="L29">        this.preparationTimeSeconds = preparationTimeSeconds;</span>
+<span class="fc" id="L30">    }</span>
+
+  
+    public String getId() {
+<span class="fc" id="L34">        return id;</span>
+    }
+
+  
+    public String getName() {
+<span class="fc" id="L39">        return name;</span>
+    }
+
+  
+    public String getDescription() {
+<span class="fc" id="L44">        return description;</span>
+    }
+
+  
+    public List&lt;Ingredient&gt; getIngredients() {
+<span class="fc" id="L49">        return ingredients;</span>
+    }
+
+  
+    public CookingStrategy getCookingStrategy() {
+<span class="fc" id="L54">        return cookingStrategy;</span>
+    }
+
+  
+    public int getRequiredSkillLevel() {
+<span class="fc" id="L59">        return requiredSkillLevel;</span>
+    }
+
+  
+    public int getComplexity() {
+<span class="fc" id="L64">        return complexity;</span>
+    }
+
+  
+    public int getPreparationTimeSeconds() {
+<span class="fc" id="L69">        return preparationTimeSeconds;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

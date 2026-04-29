@@ -1,0 +1,373 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TerminalGame.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">CSCI4448_Project</a> &gt; <a href="index.source.html" class="el_package">recipeRealm</a> &gt; <span class="el_source">TerminalGame.java</span></div><h1>TerminalGame.java</h1><pre class="source lang-java linenums">package recipeRealm;
+
+import recipeRealm.decorator.DoubleServingDecorator;
+import recipeRealm.decorator.ExtraSpicyDecorator;
+import recipeRealm.decorator.GlutenFreeDecorator;
+import recipeRealm.decorator.PremiumDecorator;
+import recipeRealm.factory.CustomerOrderFactory;
+import recipeRealm.model.CookingResult;
+import recipeRealm.model.CustomerOrder;
+import recipeRealm.model.Ingredient;
+import recipeRealm.model.Recipe;
+import recipeRealm.service.RecipeService;
+
+import java.util.List;
+import java.util.Scanner;
+
+ // Run cmd java -cp out recipeRealm.TerminalGame
+public class TerminalGame {
+
+    private static final String DIVIDER  = &quot;─────────────────────────────────────────&quot;;
+    private static final String DIVIDER2 = &quot;═════════════════════════════════════════&quot;;
+
+    private final GameManager game;
+    private final Scanner scanner;
+
+<span class="nc" id="L26">    private static final int[] XP_THRESHOLDS = { 0, 3, 7, 12, 18, 25, 33, 42, 52, 63 };</span>
+<span class="nc" id="L27">    private int ordersCompleted = 0;</span>
+
+<span class="nc" id="L29">    public TerminalGame() {</span>
+<span class="nc" id="L30">        this.game    = new GameManager(1);</span>
+<span class="nc" id="L31">        this.scanner = new Scanner(System.in);</span>
+<span class="nc" id="L32">        game.seedDefaultData();</span>
+<span class="nc" id="L33">    }</span>
+
+    public static void main(String[] args) {
+<span class="nc" id="L36">        new TerminalGame().run();</span>
+<span class="nc" id="L37">    }</span>
+
+    public void run() {
+<span class="nc" id="L40">        printSplash();</span>
+<span class="nc" id="L41">        boolean playing = true;</span>
+<span class="nc bnc" id="L42" title="All 2 branches missed.">        while (playing) {</span>
+<span class="nc" id="L43">            printStatus();</span>
+<span class="nc" id="L44">            printMainMenu();</span>
+<span class="nc" id="L45">            String choice = scanner.nextLine().trim();</span>
+<span class="nc bnc" id="L46" title="All 6 branches missed.">            switch (choice) {</span>
+<span class="nc" id="L47">                case &quot;1&quot; -&gt; handleTakeOrder();</span>
+<span class="nc" id="L48">                case &quot;2&quot; -&gt; handleViewRecipes();</span>
+<span class="nc" id="L49">                case &quot;3&quot; -&gt; handleViewInventory();</span>
+<span class="nc" id="L50">                case &quot;4&quot; -&gt; handleRecipeBook();</span>
+<span class="nc" id="L51">                case &quot;q&quot; -&gt; playing = false;</span>
+<span class="nc" id="L52">                default  -&gt; System.out.println(&quot;  Unknown option — try again.\n&quot;);</span>
+            }
+<span class="nc" id="L54">        }</span>
+<span class="nc" id="L55">        printFinalSummary();</span>
+<span class="nc" id="L56">        scanner.close();</span>
+<span class="nc" id="L57">    }</span>
+
+
+    private void printSplash() {
+<span class="nc" id="L61">        System.out.println();</span>
+<span class="nc" id="L62">        System.out.println(&quot;  ╔══════════════════════════════════════╗&quot;);</span>
+<span class="nc" id="L63">        System.out.println(&quot;  ║       R E C I P E   R E A L M        ║&quot;);</span>
+<span class="nc" id="L64">        System.out.println(&quot;  ║      Interactive Cooking Game         ║&quot;);</span>
+<span class="nc" id="L65">        System.out.println(&quot;  ╚══════════════════════════════════════╝&quot;);</span>
+<span class="nc" id="L66">        System.out.println();</span>
+<span class="nc" id="L67">        System.out.println(&quot;  You're a chef running your own restaurant.&quot;);</span>
+<span class="nc" id="L68">        System.out.println(&quot;  Cook orders, earn money, and level up your skills!&quot;);</span>
+<span class="nc" id="L69">        System.out.println(&quot;  Complete orders to gain XP and unlock harder recipes.&quot;);</span>
+<span class="nc" id="L70">        System.out.println();</span>
+<span class="nc" id="L71">        pressEnter();</span>
+<span class="nc" id="L72">    }</span>
+
+    private void printStatus() {
+<span class="nc" id="L75">        System.out.println(DIVIDER2);</span>
+<span class="nc" id="L76">        System.out.printf(&quot;  Skill: %s  |  Earnings: $%.2f  |  Average Satisfaction: %d%%%n&quot;,</span>
+<span class="nc" id="L77">                skillBar(game.getPlayerSkillLevel()),</span>
+<span class="nc" id="L78">                game.getTotalEarnings(),</span>
+<span class="nc" id="L79">                game.getAverageSatisfaction());</span>
+<span class="nc" id="L80">        int nextThreshold = nextXpThreshold();</span>
+<span class="nc bnc" id="L81" title="All 2 branches missed.">        if (nextThreshold &gt; 0) {</span>
+<span class="nc" id="L82">            System.out.printf(&quot;  XP: %d / %d orders to level up%n&quot;,</span>
+<span class="nc" id="L83">                    ordersCompleted, nextThreshold);</span>
+        } else {
+<span class="nc" id="L85">            System.out.println(&quot;  XP: MAX LEVEL reached!&quot;);</span>
+        }
+<span class="nc" id="L87">        System.out.println(DIVIDER2);</span>
+<span class="nc" id="L88">        System.out.println();</span>
+<span class="nc" id="L89">    }</span>
+
+    private void printMainMenu() {
+<span class="nc" id="L92">        System.out.println(&quot;  What would you like to do?&quot;);</span>
+<span class="nc" id="L93">        System.out.println();</span>
+<span class="nc" id="L94">        System.out.println(&quot;  1  Take a customer order&quot;);</span>
+<span class="nc" id="L95">        System.out.println(&quot;  2  View all recipes&quot;);</span>
+<span class="nc" id="L96">        System.out.println(&quot;  3  View inventory&quot;);</span>
+<span class="nc" id="L97">        System.out.println(&quot;  4  Recipe book (browse &amp; decorate)&quot;);</span>
+<span class="nc" id="L98">        System.out.println(&quot;  q  Quit&quot;);</span>
+<span class="nc" id="L99">        System.out.println();</span>
+<span class="nc" id="L100">        System.out.print(&quot;  &gt; &quot;);</span>
+<span class="nc" id="L101">    }</span>
+
+    
+    private void handleTakeOrder() {
+<span class="nc" id="L105">        System.out.println();</span>
+<span class="nc" id="L106">        System.out.println(DIVIDER);</span>
+
+<span class="nc" id="L108">        RecipeService rs = game.getRecipeService();</span>
+<span class="nc" id="L109">        List&lt;Recipe&gt; available = rs.getAvailableRecipes(game.getPlayerSkillLevel());</span>
+
+<span class="nc bnc" id="L111" title="All 2 branches missed.">        if (available.isEmpty()) {</span>
+<span class="nc" id="L112">            System.out.println(&quot;  No recipes available at your skill level yet.&quot;);</span>
+<span class="nc" id="L113">            System.out.println();</span>
+<span class="nc" id="L114">            return;</span>
+        }
+
+<span class="nc" id="L117">        CustomerOrder order = CustomerOrderFactory.createRandom(available);</span>
+<span class="nc" id="L118">        Recipe recipe = order.getRequestedRecipe();</span>
+
+<span class="nc" id="L120">        System.out.println(&quot;  A customer arrives!&quot;);</span>
+<span class="nc" id="L121">        System.out.println();</span>
+<span class="nc" id="L122">        System.out.printf(&quot;  Order:    %s (%s)%n&quot;, recipe.getName(), recipe.getCategory());</span>
+<span class="nc" id="L123">        System.out.printf(&quot;  Method:   %s%n&quot;, recipe.getCookingStrategy().getMethodName());</span>
+<span class="nc" id="L124">        System.out.printf(&quot;  Skill req: %d  |  Complexity: %d%n&quot;,</span>
+<span class="nc" id="L125">                recipe.getRequiredSkillLevel(), recipe.getComplexity());</span>
+<span class="nc" id="L126">        System.out.printf(&quot;  Price:    $%.2f%n&quot;, recipe.getBasePrice());</span>
+<span class="nc" id="L127">        System.out.printf(&quot;  Patience: %d seconds%n&quot;, order.getPatienceSeconds());</span>
+<span class="nc" id="L128">        System.out.println();</span>
+
+<span class="nc" id="L130">        Recipe finalRecipe = offerDecoration(recipe);</span>
+<span class="nc bnc" id="L131" title="All 2 branches missed.">        if (finalRecipe != recipe) {</span>
+<span class="nc" id="L132">            order = CustomerOrderFactory.createForRecipe(finalRecipe);</span>
+        }
+
+<span class="nc" id="L135">        System.out.println();</span>
+<span class="nc" id="L136">        System.out.println(&quot;  [c] Cook it   [s] Skip this order&quot;);</span>
+<span class="nc" id="L137">        System.out.print(&quot;  &gt; &quot;);</span>
+<span class="nc" id="L138">        String input = scanner.nextLine().trim().toLowerCase();</span>
+
+<span class="nc bnc" id="L140" title="All 2 branches missed.">        if (!input.equals(&quot;c&quot;)) {</span>
+<span class="nc" id="L141">            System.out.println(&quot;  Order skipped.\n&quot;);</span>
+<span class="nc" id="L142">            return;</span>
+        }
+
+<span class="nc" id="L145">        game.getOrderService().enqueueOrder(order);</span>
+<span class="nc" id="L146">        System.out.println();</span>
+<span class="nc" id="L147">        System.out.println(&quot;  Cooking...&quot;);</span>
+<span class="nc" id="L148">        CookingResult result = game.processNextOrder();</span>
+
+<span class="nc bnc" id="L150" title="All 2 branches missed.">        if (result == null) {</span>
+<span class="nc" id="L151">            System.out.println(&quot;  The order expired before you could cook it!\n&quot;);</span>
+<span class="nc" id="L152">            return;</span>
+        }
+
+<span class="nc" id="L155">        printCookingResult(result, order);</span>
+
+<span class="nc" id="L157">        List&lt;Ingredient&gt; alerts = game.getStockObserver().getAlerts();</span>
+
+<span class="nc bnc" id="L159" title="All 2 branches missed.">        for (Ingredient ingredient: alerts){</span>
+<span class="nc" id="L160">            System.out.println(&quot; WARNING: &quot; + ingredient.getName() + &quot; is Low/Expired&quot;);</span>
+<span class="nc" id="L161">            System.out.println(&quot;  1  Buy more    2  Remove affected recipes&quot;);</span>
+<span class="nc" id="L162">            String choice = scanner.nextLine().trim();</span>
+<span class="nc bnc" id="L163" title="All 2 branches missed.">            if (choice.equals(&quot;1&quot;)){</span>
+<span class="nc" id="L164">                double cost = ingredient.getRequiredAmount() * ingredient.getCostPerUnit();</span>
+<span class="nc bnc" id="L165" title="All 2 branches missed.">                if(cost &gt; game.getTotalEarnings()){</span>
+<span class="nc" id="L166">                    game.getRecipeService().removeRecipeWithIngredient(ingredient);</span>
+<span class="nc" id="L167">                    System.out.println(&quot;Insufficient funds Removed all recipes using &quot; + ingredient.getName());</span>
+                }else{
+<span class="nc" id="L169">                    game.spendFunds(cost);</span>
+<span class="nc" id="L170">                    game.getInventoryService().restockIngredient(ingredient.getId(), ingredient.getRequiredAmount());</span>
+                }
+
+<span class="nc" id="L173">            }else{</span>
+<span class="nc" id="L174">                game.getRecipeService().removeRecipeWithIngredient(ingredient);</span>
+<span class="nc" id="L175">                System.out.println(&quot;  Removed all recipes using &quot; + ingredient.getName());</span>
+            }
+<span class="nc" id="L177">        }</span>
+<span class="nc" id="L178">        game.getStockObserver().clearAlerts();</span>
+<span class="nc" id="L179">        ordersCompleted++;</span>
+<span class="nc" id="L180">        checkLevelUp();</span>
+<span class="nc" id="L181">        System.out.println();</span>
+<span class="nc" id="L182">    }</span>
+
+
+
+    private Recipe offerDecoration(Recipe base) {
+<span class="nc" id="L187">        System.out.println(&quot;  Add a special variation? (optional)&quot;);</span>
+<span class="nc" id="L188">        System.out.println(&quot;  1  Extra Spicy  (+$2.00, +1 complexity)&quot;);</span>
+<span class="nc" id="L189">        System.out.println(&quot;  2  Premium      (×1.5 price, +1 skill req)&quot;);</span>
+<span class="nc" id="L190">        System.out.println(&quot;  3  Double       (×2 price, ×2 prep time)&quot;);</span>
+<span class="nc" id="L191">        System.out.println(&quot;  4  Gluten-Free  (+$3.00, +10s prep)&quot;);</span>
+<span class="nc" id="L192">        System.out.println(&quot;  5  No variation&quot;);</span>
+<span class="nc" id="L193">        System.out.print(&quot;  &gt; &quot;);</span>
+<span class="nc" id="L194">        String choice = scanner.nextLine().trim();</span>
+<span class="nc bnc" id="L195" title="All 5 branches missed.">        return switch (choice) {</span>
+<span class="nc" id="L196">            case &quot;1&quot; -&gt; new ExtraSpicyDecorator(base);</span>
+<span class="nc" id="L197">            case &quot;2&quot; -&gt; new PremiumDecorator(base);</span>
+<span class="nc" id="L198">            case &quot;3&quot; -&gt; new DoubleServingDecorator(base);</span>
+<span class="nc" id="L199">            case &quot;4&quot; -&gt; new GlutenFreeDecorator(base);</span>
+<span class="nc" id="L200">            default  -&gt; base;</span>
+        };
+    }
+
+    private void printCookingResult(CookingResult result, CustomerOrder order){
+<span class="nc" id="L205">        System.out.println();</span>
+<span class="nc" id="L206">        System.out.println(DIVIDER);</span>
+<span class="nc" id="L207">        System.out.printf(&quot;  Method:   %s%n&quot;, result.getCookingMethod());</span>
+<span class="nc" id="L208">        System.out.printf(&quot;  Score:    %d / 100%n&quot;, result.getScore());</span>
+<span class="nc" id="L209">        System.out.printf(&quot;  Stars:    %s%n&quot;, stars(result.getStarRating()));</span>
+<span class="nc" id="L210">        System.out.printf(&quot;  Time:     %ds%n&quot;, result.getTimeTakenSeconds());</span>
+<span class="nc bnc" id="L211" title="All 2 branches missed.">        System.out.printf(&quot;  Result:   %s%n&quot;, result.isSuccess() ? &quot;SUCCESS&quot; : &quot;FAILED&quot;);</span>
+<span class="nc" id="L212">        System.out.printf(&quot;  Satisfaction:   %d / 100%n&quot;, game.getLastOrderSatisfaction());</span>
+<span class="nc" id="L213">        System.out.printf(&quot;  Feedback: %s%n&quot;, result.getFeedbackMessage());</span>
+
+<span class="nc bnc" id="L215" title="All 2 branches missed.">        if (result.isSuccess()) {</span>
+<span class="nc" id="L216">            double earned = game.getLastOrderEarnings();</span>
+<span class="nc" id="L217">            System.out.printf(&quot;  Earned:   $%.2f%n&quot;, earned);</span>
+        }
+        
+<span class="nc" id="L220">        System.out.println(DIVIDER);</span>
+<span class="nc" id="L221">    }</span>
+
+    private void handleViewRecipes() {
+<span class="nc" id="L224">        System.out.println();</span>
+<span class="nc" id="L225">        System.out.println(DIVIDER);</span>
+<span class="nc" id="L226">        System.out.println(&quot;  ALL RECIPES&quot;);</span>
+<span class="nc" id="L227">        System.out.println(DIVIDER);</span>
+<span class="nc" id="L228">        List&lt;Recipe&gt; all = game.getAllRecipes();</span>
+<span class="nc bnc" id="L229" title="All 2 branches missed.">        for (Recipe r : all) {</span>
+<span class="nc bnc" id="L230" title="All 2 branches missed.">            String lock = r.getRequiredSkillLevel() &gt; game.getPlayerSkillLevel() ? &quot; [LOCKED]&quot; : &quot;&quot;;</span>
+<span class="nc" id="L231">            System.out.printf(&quot;  %-22s  %-12s  Skill: %d  Price: $%.2f%s%n&quot;,</span>
+<span class="nc" id="L232">                    r.getName(), r.getCategory(),</span>
+<span class="nc" id="L233">                    r.getRequiredSkillLevel(), r.getBasePrice(), lock);</span>
+<span class="nc" id="L234">        }</span>
+<span class="nc" id="L235">        System.out.println(DIVIDER);</span>
+<span class="nc" id="L236">        System.out.println();</span>
+<span class="nc" id="L237">        pressEnter();</span>
+<span class="nc" id="L238">    }</span>
+
+    private void handleViewInventory() {
+<span class="nc" id="L241">        System.out.println();</span>
+<span class="nc" id="L242">        System.out.println(DIVIDER);</span>
+<span class="nc" id="L243">        System.out.println(&quot;  INVENTORY&quot;);</span>
+<span class="nc" id="L244">        System.out.println(DIVIDER);</span>
+<span class="nc" id="L245">        game.getInventoryService().getAllIngredients().forEach(i -&gt; {</span>
+<span class="nc bnc" id="L246" title="All 4 branches missed.">            String status = i.isExpired() ? &quot; [EXPIRED]&quot;: !i.isAvailable() ? &quot; [LOW STOCK]&quot; : &quot;&quot;;</span>
+<span class="nc" id="L247">            System.out.printf(&quot;  %-14s  %.1f %s%s%n&quot;,</span>
+<span class="nc" id="L248">                    i.getName(), i.getQuantity(), i.getUnit(), status);</span>
+<span class="nc" id="L249">        });</span>
+<span class="nc" id="L250">        System.out.println(DIVIDER);</span>
+<span class="nc" id="L251">        System.out.println();</span>
+<span class="nc" id="L252">        pressEnter();</span>
+<span class="nc" id="L253">    }</span>
+
+    private void handleRecipeBook() {
+<span class="nc" id="L256">        System.out.println();</span>
+<span class="nc" id="L257">        System.out.println(DIVIDER);</span>
+<span class="nc" id="L258">        System.out.println(&quot;  RECIPE BOOK — pick a recipe to inspect&quot;);</span>
+<span class="nc" id="L259">        System.out.println(DIVIDER);</span>
+
+<span class="nc" id="L261">        List&lt;Recipe&gt; all = game.getAllRecipes();</span>
+<span class="nc bnc" id="L262" title="All 2 branches missed.">        for (int i = 0; i &lt; all.size(); i++) {</span>
+<span class="nc" id="L263">            Recipe r = all.get(i);</span>
+<span class="nc" id="L264">            System.out.printf(&quot;  %d  %s%n&quot;, i + 1, r.getName());</span>
+        }
+<span class="nc" id="L266">        System.out.println(&quot;  b  Back&quot;);</span>
+<span class="nc" id="L267">        System.out.print(&quot;  &gt; &quot;);</span>
+<span class="nc" id="L268">        String input = scanner.nextLine().trim();</span>
+
+<span class="nc bnc" id="L270" title="All 2 branches missed.">        if (input.equalsIgnoreCase(&quot;b&quot;)) return;</span>
+
+        try {
+<span class="nc" id="L273">            int idx = Integer.parseInt(input) - 1;</span>
+<span class="nc bnc" id="L274" title="All 4 branches missed.">            if (idx &lt; 0 || idx &gt;= all.size()) {</span>
+<span class="nc" id="L275">                System.out.println(&quot;  Invalid selection.\n&quot;);</span>
+<span class="nc" id="L276">                return;</span>
+            }
+<span class="nc" id="L278">            printRecipeDetail(all.get(idx));</span>
+<span class="nc" id="L279">        } catch (NumberFormatException e) {</span>
+<span class="nc" id="L280">            System.out.println(&quot;  Invalid selection.\n&quot;);</span>
+<span class="nc" id="L281">        }</span>
+<span class="nc" id="L282">    }</span>
+
+    private void printRecipeDetail(Recipe r) {
+<span class="nc" id="L285">        System.out.println();</span>
+<span class="nc" id="L286">        System.out.println(DIVIDER);</span>
+<span class="nc" id="L287">        System.out.printf(&quot;  %s  (%s)%n&quot;, r.getName(), r.getCategory());</span>
+<span class="nc" id="L288">        System.out.println(DIVIDER);</span>
+<span class="nc" id="L289">        System.out.printf(&quot;  %s%n&quot;, r.getDescription());</span>
+<span class="nc" id="L290">        System.out.println();</span>
+<span class="nc" id="L291">        System.out.printf(&quot;  Cooking method:  %s%n&quot;, r.getCookingStrategy().getMethodName());</span>
+<span class="nc" id="L292">        System.out.printf(&quot;  Skill required:  %d%n&quot;, r.getRequiredSkillLevel());</span>
+<span class="nc" id="L293">        System.out.printf(&quot;  Complexity:      %d / 5%n&quot;, r.getComplexity());</span>
+<span class="nc" id="L294">        System.out.printf(&quot;  Prep time:       %ds%n&quot;, r.getPreparationTimeSeconds());</span>
+<span class="nc" id="L295">        System.out.printf(&quot;  Base price:      $%.2f%n&quot;, r.getBasePrice());</span>
+<span class="nc" id="L296">        System.out.println();</span>
+<span class="nc" id="L297">        System.out.println(&quot;  Ingredients:&quot;);</span>
+<span class="nc" id="L298">        r.getIngredients().forEach(i -&gt;</span>
+<span class="nc" id="L299">            System.out.printf(&quot;    - %s  %.1f %s%n&quot;, i.getName(), i.getRequiredAmount(), i.getUnit()));</span>
+<span class="nc" id="L300">        System.out.println(DIVIDER);</span>
+<span class="nc" id="L301">        System.out.println();</span>
+<span class="nc" id="L302">        pressEnter();</span>
+<span class="nc" id="L303">    }</span>
+
+    private boolean confirmQuit() {
+<span class="nc" id="L306">        System.out.print(&quot;  Quit the game? (y/n) &gt; &quot;);</span>
+<span class="nc bnc" id="L307" title="All 2 branches missed.">        String answer = scanner.hasNextLine() ? scanner.nextLine().trim() : &quot;y&quot;;</span>
+<span class="nc bnc" id="L308" title="All 2 branches missed.">        if (answer.equalsIgnoreCase(&quot;y&quot;)) return true;</span>
+<span class="nc" id="L309">        System.out.println(&quot;  Returning to menu.\n&quot;);</span>
+<span class="nc" id="L310">        return false;</span>
+    }
+
+   
+    private void checkLevelUp() {
+<span class="nc" id="L315">        int current = game.getPlayerSkillLevel();</span>
+<span class="nc bnc" id="L316" title="All 2 branches missed.">        if (current &gt;= 10) return;</span>
+<span class="nc bnc" id="L317" title="All 2 branches missed.">        if (ordersCompleted &gt;= XP_THRESHOLDS[current]) {</span>
+<span class="nc" id="L318">            game.levelUp();</span>
+<span class="nc" id="L319">            System.out.println();</span>
+<span class="nc" id="L320">            System.out.println(&quot;  ★ LEVEL UP! ★&quot;);</span>
+<span class="nc" id="L321">            System.out.printf(&quot;  You are now a skill-%d chef!%n&quot;, game.getPlayerSkillLevel());</span>
+<span class="nc" id="L322">            List&lt;Recipe&gt; newUnlocks = game.getRecipeService()</span>
+<span class="nc" id="L323">                    .getAvailableRecipes(game.getPlayerSkillLevel());</span>
+<span class="nc" id="L324">            long newCount = newUnlocks.stream()</span>
+<span class="nc bnc" id="L325" title="All 2 branches missed.">                    .filter(r -&gt; r.getRequiredSkillLevel() == game.getPlayerSkillLevel())</span>
+<span class="nc" id="L326">                    .count();</span>
+<span class="nc bnc" id="L327" title="All 2 branches missed.">            if (newCount &gt; 0) {</span>
+<span class="nc" id="L328">                System.out.printf(&quot;  %d new recipe(s) unlocked — check the recipe book!%n&quot;, newCount);</span>
+            }
+        }
+<span class="nc" id="L331">    }</span>
+
+    private int nextXpThreshold() {
+<span class="nc" id="L334">        int current = game.getPlayerSkillLevel();</span>
+<span class="nc bnc" id="L335" title="All 2 branches missed.">        if (current &gt;= 10) return -1;</span>
+<span class="nc" id="L336">        return XP_THRESHOLDS[current];</span>
+    }
+
+   
+    private void printFinalSummary() {
+<span class="nc" id="L341">        System.out.println();</span>
+<span class="nc" id="L342">        System.out.println(&quot;  ╔══════════════════════════════════════╗&quot;);</span>
+<span class="nc" id="L343">        System.out.println(&quot;  ║           SESSION SUMMARY            ║&quot;);</span>
+<span class="nc" id="L344">        System.out.println(&quot;  ╚══════════════════════════════════════╝&quot;);</span>
+<span class="nc" id="L345">        System.out.printf(&quot;  Orders completed:    %d%n&quot;, ordersCompleted);</span>
+<span class="nc" id="L346">        System.out.printf(&quot;  Total earnings:      $%.2f%n&quot;, game.getTotalEarnings());</span>
+<span class="nc" id="L347">        System.out.printf(&quot;  Avg satisfaction:    %d%%%n&quot;, game.getAverageSatisfaction());</span>
+<span class="nc" id="L348">        System.out.printf(&quot;  Final skill level:   %d / 10%n&quot;, game.getPlayerSkillLevel());</span>
+<span class="nc" id="L349">        System.out.println();</span>
+<span class="nc" id="L350">        System.out.println(&quot;  Thanks for playing!&quot;);</span>
+<span class="nc" id="L351">        System.out.println();</span>
+<span class="nc" id="L352">    }</span>
+
+ 
+
+    private String skillBar(int level) {
+<span class="nc" id="L357">        StringBuilder sb = new StringBuilder(&quot;Lv.&quot; + level + &quot; [&quot;);</span>
+<span class="nc bnc" id="L358" title="All 4 branches missed.">        for (int i = 1; i &lt;= 10; i++) sb.append(i &lt;= level ? &quot;█&quot; : &quot;░&quot;);</span>
+<span class="nc" id="L359">        sb.append(&quot;]&quot;);</span>
+<span class="nc" id="L360">        return sb.toString();</span>
+    }
+
+    private String stars(int count) {
+<span class="nc" id="L364">        return &quot;★&quot;.repeat(count) + &quot;☆&quot;.repeat(5 - count);</span>
+    }
+
+    private void pressEnter() {
+<span class="nc" id="L368">        System.out.print(&quot;  Press Enter to continue...&quot;);</span>
+<span class="nc" id="L369">        scanner.nextLine();</span>
+<span class="nc" id="L370">        System.out.println();</span>
+<span class="nc" id="L371">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>
